@@ -1,7 +1,7 @@
 {
   "name": "pgn-viewer",
   "version": "1.0.0",
-  "description": "A TypeScript module for parsing PGN files and displaying them in a web page.",
+  "description": "A TypeScript module for parsing PGN moves and displaying them in a web page.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
