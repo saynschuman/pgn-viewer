@@ -2,18 +2,8 @@ import { Api as CgApi } from "chessground/api";
 import { Config as CgConfig } from "chessground/config";
 import { FEN } from "chessground/types";
 import { Color, Move, Position } from "chessops";
-import { CommentShape, PgnNodeData } from "chessops/pgn";
+import { ChildNode, CommentShape, Node, PgnNodeData } from "chessops/pgn";
 export type AnyNode = Node<MoveData>;
-export declare class Node<T> {
-    children: ChildNode<T>[];
-    mainlineNodes(): Iterable<ChildNode<T>>;
-    mainline(): Iterable<T>;
-    end(): Node<T>;
-}
-export declare class ChildNode<T> extends Node<T> {
-    data: T;
-    constructor(data: T);
-}
 export type Id = string;
 export type San = string;
 export type Uci = string;
@@ -179,7 +169,7 @@ export declare class State {
     constructor(pos: Position, path: Path, clocks: Clocks);
     clone: () => State;
 }
-export declare const makeMoves: (start: Position, moves: Node<PgnNodeData>, metadata: Metadata) => import("chessops/pgn").Node<MoveData>;
+export declare const makeMoves: (start: Position, moves: Node<PgnNodeData>, metadata: Metadata) => Node<MoveData>;
 export declare const makeGame: (pgn: string, lichess?: Lichess) => Game;
 export declare class PgnViewer {
     readonly opts: Opts;
