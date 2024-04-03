@@ -6,7 +6,9 @@ import { Color, makeSquare, makeUci, Move, opposite, Position } from "chessops";
 import { scalachessCharPair } from "chessops/compat";
 import { makeFen } from "chessops/fen";
 import {
+  ChildNode,
   CommentShape,
+  Node,
   parseComment,
   parsePgn,
   PgnNodeData,
@@ -16,17 +18,6 @@ import {
 import { makeSanAndPlay, parseSan } from "chessops/san";
 
 export type AnyNode = Node<MoveData>;
-
-export declare class Node<T> {
-  children: ChildNode<T>[];
-  mainlineNodes(): Iterable<ChildNode<T>>;
-  mainline(): Iterable<T>;
-  end(): Node<T>;
-}
-export declare class ChildNode<T> extends Node<T> {
-  data: T;
-  constructor(data: T);
-}
 
 export type Id = string;
 export type San = string;
