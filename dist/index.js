@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PgnViewer = exports.makeGame = exports.makeMoves = exports.State = exports.makeMetadata = exports.parseComments = exports.Game = exports.isMoveData = exports.isMoveNode = exports.tail = exports.head = exports.childById = exports.Path = void 0;
-const util_1 = require("chessground/util");
-const chessops_1 = require("chessops");
-const compat_1 = require("chessops/compat");
-const fen_1 = require("chessops/fen");
-const pgn_1 = require("chessops/pgn");
-const san_1 = require("chessops/san");
-class Path {
+import { uciToMove } from "chessground/util";
+import { makeSquare, makeUci, opposite } from "chessops";
+import { scalachessCharPair } from "chessops/compat";
+import { makeFen } from "chessops/fen";
+import { parseComment, parsePgn, startingPosition, transform, } from "chessops/pgn";
+import { makeSanAndPlay, parseSan } from "chessops/san";
+export class Path {
     constructor(path) {
         this.path = path;
         this.size = () => this.path.length / 2;
@@ -23,31 +20,25 @@ class Path {
         this.equals = (other) => this.path == other.path;
     }
 }
-exports.Path = Path;
 Path.root = new Path("");
-function childById(node, id) {
+export function childById(node, id) {
     return node.children.find((child) => { var _a; return ((_a = child.data) === null || _a === void 0 ? void 0 : _a.id) === id; });
 }
-exports.childById = childById;
-function head(path) {
+export function head(path) {
     return path.slice(0, 2);
 }
-exports.head = head;
-function tail(path) {
+export function tail(path) {
     return path.slice(2);
 }
-exports.tail = tail;
 const nodeAtPathFrom = (node, path) => {
     if (path.empty())
         return node;
     const child = childById(node, path.head());
     return child ? nodeAtPathFrom(child, path.tail()) : undefined;
 };
-const isMoveNode = (n) => "data" in n;
-exports.isMoveNode = isMoveNode;
-const isMoveData = (d) => "uci" in d;
-exports.isMoveData = isMoveData;
-class Game {
+export const isMoveNode = (n) => "data" in n;
+export const isMoveData = (d) => "uci" in d;
+export class Game {
     constructor(initial, moves, players, metadata) {
         this.initial = initial;
         this.moves = moves;
@@ -56,7 +47,7 @@ class Game {
         this.nodeAt = (path) => nodeAtPathFrom(this.moves, path);
         this.dataAt = (path) => {
             const node = this.nodeAt(path);
-            return node ? ((0, exports.isMoveNode)(node) ? node.data : this.initial) : undefined;
+            return node ? (isMoveNode(node) ? node.data : this.initial) : undefined;
         };
         this.title = () => this.players.white.name
             ? [
@@ -80,9 +71,8 @@ class Game {
         this.mainline = Array.from(this.moves.mainline());
     }
 }
-exports.Game = Game;
-const parseComments = (strings) => {
-    const comments = strings.map(pgn_1.parseComment);
+export const parseComments = (strings) => {
+    const comments = strings.map(parseComment);
     const reduceTimes = (times) => times.reduce((last, time) => (typeof time == "undefined" ? last : time), undefined);
     return {
         texts: comments.map((c) => c.text).filter((t) => !!t),
@@ -92,8 +82,7 @@ const parseComments = (strings) => {
         emt: reduceTimes(comments.map((c) => c.emt)),
     };
 };
-exports.parseComments = parseComments;
-function makeMetadata(headers, lichess) {
+export function makeMetadata(headers, lichess) {
     var _a;
     const site = headers.get("source") || headers.get("site");
     const result = headers.get("result");
@@ -116,41 +105,43 @@ function makeMetadata(headers, lichess) {
         result,
     };
 }
-exports.makeMetadata = makeMetadata;
-class State {
+export class State {
     constructor(pos, path, clocks) {
         this.pos = pos;
         this.path = path;
         this.clocks = clocks;
-        this.clone = () => new State(this.pos.clone(), this.path, Object.assign({}, this.clocks));
+        this.clone = () => new State(this.pos.clone(), this.path, { ...this.clocks });
     }
 }
-exports.State = State;
-const makeClocks = (prev, turn, clk) => turn == "white" ? Object.assign(Object.assign({}, prev), { black: clk }) : Object.assign(Object.assign({}, prev), { white: clk });
-const makeMoves = (start, moves, metadata) => (0, pgn_1.transform)(moves, new State(start, Path.root, {}), (state, node) => {
-    const move = (0, san_1.parseSan)(state.pos, node.san);
+const makeClocks = (prev, turn, clk) => turn == "white" ? { ...prev, black: clk } : { ...prev, white: clk };
+export const makeMoves = (start, moves, metadata) => transform(moves, new State(start, Path.root, {}), (state, node) => {
+    const move = parseSan(state.pos, node.san);
     if (!move)
         return undefined;
-    const moveId = (0, compat_1.scalachessCharPair)(move);
+    const moveId = scalachessCharPair(move);
     const path = state.path.append(moveId);
-    const san = (0, san_1.makeSanAndPlay)(state.pos, move);
+    const san = makeSanAndPlay(state.pos, move);
     state.path = path;
     const setup = state.pos.toSetup();
-    const comments = (0, exports.parseComments)(node.comments || []);
-    const startingComments = (0, exports.parseComments)(node.startingComments || []);
+    const comments = parseComments(node.comments || []);
+    const startingComments = parseComments(node.startingComments || []);
     const shapes = [...comments.shapes, ...startingComments.shapes];
     const ply = (setup.fullmoves - 1) * 2 + (state.pos.turn === "white" ? 0 : 1);
     let clocks = (state.clocks = makeClocks(state.clocks, state.pos.turn, comments.clock));
     if (ply < 2 && metadata.timeControl)
-        clocks = Object.assign({ white: metadata.timeControl.initial, black: metadata.timeControl.initial }, clocks);
+        clocks = {
+            white: metadata.timeControl.initial,
+            black: metadata.timeControl.initial,
+            ...clocks,
+        };
     const moveNode = {
         path,
         ply,
         id: moveId,
         move,
         san,
-        uci: (0, chessops_1.makeUci)(move),
-        fen: (0, fen_1.makeFen)(state.pos.toSetup()),
+        uci: makeUci(move),
+        fen: makeFen(state.pos.toSetup()),
         turn: state.pos.turn,
         check: state.pos.isCheck(),
         comments: comments.texts,
@@ -162,7 +153,6 @@ const makeMoves = (start, moves, metadata) => (0, pgn_1.transform)(moves, new St
     };
     return moveNode;
 });
-exports.makeMoves = makeMoves;
 function makePlayers(headers, metadata) {
     const get = (color, field) => {
         const raw = headers.get(`${color}${field}`) || undefined;
@@ -183,12 +173,12 @@ function makePlayers(headers, metadata) {
         black: makePlayer("black"),
     };
 }
-const makeGame = (pgn, lichess = false) => {
+export const makeGame = (pgn, lichess = false) => {
     var _a, _b;
-    const game = (0, pgn_1.parsePgn)(pgn)[0] || (0, pgn_1.parsePgn)("*")[0];
-    const start = (0, pgn_1.startingPosition)(game.headers).unwrap();
-    const fen = (0, fen_1.makeFen)(start.toSetup());
-    const comments = (0, exports.parseComments)(game.comments || []);
+    const game = parsePgn(pgn)[0] || parsePgn("*")[0];
+    const start = startingPosition(game.headers).unwrap();
+    const fen = makeFen(start.toSetup());
+    const comments = parseComments(game.comments || []);
     const headers = new Map(Array.from(game.headers, ([key, value]) => [key.toLowerCase(), value]));
     const metadata = makeMetadata(headers, lichess);
     const initial = {
@@ -203,12 +193,11 @@ const makeGame = (pgn, lichess = false) => {
             black: ((_b = metadata.timeControl) === null || _b === void 0 ? void 0 : _b.initial) || comments.clock,
         },
     };
-    const moves = (0, exports.makeMoves)(start, game.moves, metadata);
+    const moves = makeMoves(start, game.moves, metadata);
     const players = makePlayers(headers, metadata);
     return new Game(initial, moves, players, metadata);
 };
-exports.makeGame = makeGame;
-class PgnViewer {
+export class PgnViewer {
     constructor(opts) {
         this.opts = opts;
         this.flipped = false;
@@ -315,7 +304,7 @@ class PgnViewer {
         };
         this.orientation = () => {
             const base = this.opts.orientation || "white";
-            return this.flipped ? (0, chessops_1.opposite)(base) : base;
+            return this.flipped ? opposite(base) : base;
         };
         this.flip = () => {
             this.flipped = !this.flipped;
@@ -326,8 +315,8 @@ class PgnViewer {
         this.cgState = () => {
             var _a;
             const data = this.curData();
-            const lastMove = (0, exports.isMoveData)(data)
-                ? (0, util_1.uciToMove)(data.uci)
+            const lastMove = isMoveData(data)
+                ? uciToMove(data.uci)
                 : (_a = this.opts.chessground) === null || _a === void 0 ? void 0 : _a.lastMove;
             return {
                 fen: data.fen,
@@ -344,13 +333,13 @@ class PgnViewer {
         this.redrawGround = () => this.withGround((g) => {
             g.set(this.cgState());
             g.setShapes(this.curData().shapes.map((s) => ({
-                orig: (0, chessops_1.makeSquare)(s.from),
-                dest: (0, chessops_1.makeSquare)(s.to),
+                orig: makeSquare(s.from),
+                dest: makeSquare(s.to),
                 brush: s.color,
             })));
         });
         this.withGround = (f) => this.ground && f(this.ground);
-        this.game = (0, exports.makeGame)(opts.pgn, opts.lichess);
+        this.game = makeGame(opts.pgn, opts.lichess);
         opts.orientation = opts.orientation || this.game.metadata.orientation;
         if (opts.initialPly) {
             this.path = this.game.pathAtMainlinePly(opts.initialPly);
@@ -360,4 +349,3 @@ class PgnViewer {
         }
     }
 }
-exports.PgnViewer = PgnViewer;
