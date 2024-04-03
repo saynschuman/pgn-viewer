@@ -13,6 +13,7 @@
     "module": "esnext",
     "esModuleInterop": true,
     "isolatedModules": true,
+    "declaration": true,
   },
   "include": ["src/**/*"]
 }
