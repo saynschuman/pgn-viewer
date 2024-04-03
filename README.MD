@@ -22,7 +22,7 @@ yarn add pgn-viewer
 ## Usage Example
 
 ```javascript
-import { Game, PgnViewer } from 'your-library-name';
+import { PgnViewer } from 'pgn-viewer';
 
 const pgnViewer = new PgnViewer({
   pgn: 'Your PGN text here',
