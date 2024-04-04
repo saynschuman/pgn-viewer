@@ -2,7 +2,15 @@ import { Api as CgApi } from "chessground/api";
 import { Config as CgConfig } from "chessground/config";
 import { FEN } from "chessground/types";
 import { Color, Move, Position } from "chessops";
+import { lichessRules } from "chessops/compat";
+import { makeBoardFen, parseFen } from "chessops/fen";
 import { ChildNode, CommentShape, Node, PgnNodeData } from "chessops/pgn";
+import { makeSanVariation } from "chessops/san";
+import { Square, parseSquare, parseUci } from "chessops";
+import { Chess } from "chessops/chess";
+import { setupPosition } from "chessops/variant";
+export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, };
+export type { Color, Position, Move, FEN, Square };
 export type AnyNode = Node<MoveData>;
 export type Id = string;
 export type San = string;
@@ -205,4 +213,3 @@ export declare class PgnViewer {
     private redrawGround;
     private withGround;
 }
-export {};

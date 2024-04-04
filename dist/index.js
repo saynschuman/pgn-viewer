@@ -1,9 +1,13 @@
 import { uciToMove } from "chessground/util";
 import { makeSquare, makeUci, opposite } from "chessops";
-import { scalachessCharPair } from "chessops/compat";
-import { makeFen } from "chessops/fen";
+import { scalachessCharPair, lichessRules } from "chessops/compat";
+import { makeFen, makeBoardFen, parseFen } from "chessops/fen";
 import { parseComment, parsePgn, startingPosition, transform, } from "chessops/pgn";
-import { makeSanAndPlay, parseSan } from "chessops/san";
+import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
+import { parseSquare, parseUci } from "chessops";
+import { Chess } from "chessops/chess";
+import { setupPosition } from "chessops/variant";
+export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, };
 export class Path {
     constructor(path) {
         this.path = path;

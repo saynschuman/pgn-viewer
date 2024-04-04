@@ -3,8 +3,8 @@ import { Config as CgConfig } from "chessground/config";
 import { FEN } from "chessground/types";
 import { uciToMove } from "chessground/util";
 import { Color, makeSquare, makeUci, Move, opposite, Position } from "chessops";
-import { scalachessCharPair } from "chessops/compat";
-import { makeFen } from "chessops/fen";
+import { scalachessCharPair, lichessRules } from "chessops/compat";
+import { makeFen, makeBoardFen, parseFen } from "chessops/fen";
 import {
   ChildNode,
   CommentShape,
@@ -15,7 +15,22 @@ import {
   startingPosition,
   transform,
 } from "chessops/pgn";
-import { makeSanAndPlay, parseSan } from "chessops/san";
+import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
+import { Square, parseSquare, parseUci } from "chessops";
+import { Chess } from "chessops/chess";
+import { setupPosition } from "chessops/variant";
+
+export {
+  Chess,
+  lichessRules,
+  makeBoardFen,
+  parseFen,
+  setupPosition,
+  parseSquare,
+  parseUci,
+  makeSanVariation,
+};
+export type { Color, Position, Move, FEN, Square };
 
 export type AnyNode = Node<MoveData>;
 
