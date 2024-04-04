@@ -1,6 +1,6 @@
 {
   "name": "pgn-viewer",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "A TypeScript module for parsing PGN moves and displaying them in a web page.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,9 +12,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "chessground": "^9.0.4",
-    "chessops": "^0.14.0",
-    "usehooks-ts": "^2.15.1",
-    "moment": "^2.30.1"
+    "chessops": "^0.14.0"
   },
   "keywords": [
     "chess",

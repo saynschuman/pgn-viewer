@@ -1,3 +1,4 @@
+import { Chessground } from "chessground";
 import { uciToMove } from "chessground/util";
 import { makeSquare, makeUci, opposite } from "chessops";
 import { scalachessCharPair, lichessRules } from "chessops/compat";
@@ -7,7 +8,113 @@ import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
 import { parseSquare, parseUci } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
-export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, makeSanAndPlay };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground };
+export const renderMove = (ctrl) => (move, isVariation = false) => {
+    return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
+};
+export const moveTurn = (move) => `${Math.floor((move.ply - 1) / 2) + 1}.`;
+export const emptyMove = () => "...";
+export const commentNode = (comment) => ({
+    text: comment,
+    type: "comment",
+});
+export const indexNode = (turn) => `${turn}`;
+export const parenOpen = () => '<span class="paren-element op">(</span>';
+export const parenClose = () => '<span class="paren-element cl">)</span>';
+export const makeMainVariation = (moveDom, node) => [
+    // @ts-ignore
+    ...node.data.startingComments.map(commentNode),
+    ...makeVariationMoves(moveDom, node),
+];
+export const makeVariationMoves = (moveDom, node) => {
+    let elms = [];
+    let variations = [];
+    // @ts-ignore
+    if (node.data.ply % 2 == 0)
+        elms.push(`${moveTurn(node.data)}.. `);
+    do {
+        const move = node.data;
+        // @ts-ignore
+        if (move.ply % 2 == 1)
+            elms.push(moveTurn(move));
+        // @ts-ignore
+        elms.push(moveDom(move));
+        // @ts-ignore
+        move.comments.forEach((comment) => elms.push(commentNode(comment)));
+        variations.forEach((variation) => {
+            elms = [
+                ...elms,
+                parenOpen(),
+                ...makeVariationMoves(moveDom, variation),
+                parenClose(),
+            ];
+        });
+        variations = node.children.slice(1);
+        node = node.children[0];
+    } while (node);
+    return elms;
+};
+export const makeMoveNodes = (ctrl) => {
+    const moveDom = renderMove(ctrl);
+    const elms = [];
+    let node, variations = ctrl.game.moves.children.slice(1);
+    if (ctrl.game.initial.pos.turn == "black" && ctrl.game.mainline[0])
+        elms.push(indexNode(ctrl.game.initial.pos.fullmoves), emptyMove());
+    // @ts-ignore
+    while ((node = (node || ctrl.game.moves).children[0])) {
+        const move = node.data;
+        // @ts-ignore
+        const oddMove = move.ply % 2 == 1;
+        // @ts-ignore
+        if (oddMove)
+            elms.push(indexNode(moveTurn(move)));
+        // @ts-ignore
+        elms.push(moveDom(move));
+        const addEmptyMove = 
+        // @ts-ignore
+        oddMove &&
+            // @ts-ignore
+            (variations.length || move.comments.length) &&
+            node.children.length;
+        if (addEmptyMove)
+            elms.push(emptyMove());
+        // @ts-ignore
+        move.comments.forEach((comment) => elms.push(commentNode(comment)));
+        variations.forEach((variation) => 
+        // @ts-ignore
+        elms.push(makeMainVariation((data) => moveDom(data, true), variation)));
+        // @ts-ignore
+        if (addEmptyMove)
+            elms.push(indexNode(moveTurn(move)), emptyMove());
+        variations = node.children.slice(1);
+    }
+    return elms;
+};
+export function renderPvMoves(currentFen, pv) {
+    const position = setupPosition(lichessRules("standard"), parseFen(currentFen).unwrap());
+    const pos = position.unwrap();
+    const vnodes = [];
+    for (let i = 0; i < pv.length; i++) {
+        let text;
+        if (pos.turn === "white") {
+            text = `${pos.fullmoves}.`;
+        }
+        else if (i === 0) {
+            text = `${pos.fullmoves}...`;
+        }
+        if (text) {
+            vnodes.push({ text });
+        }
+        const uci = pv[i];
+        const san = makeSanAndPlay(pos, parseUci(uci));
+        const fen = makeBoardFen(pos.board); // Chessground uses only board fen
+        if (san === "--") {
+            break;
+        }
+        vnodes.push({ fen: `${fen}`, san, uci });
+    }
+    return vnodes;
+}
 export class Path {
     constructor(path) {
         this.path = path;

@@ -1,21 +1,45 @@
+import { Key, FEN } from "chessground/types";
+import { Chessground } from "chessground";
+import { Role } from "chessground/types";
 import { Api as CgApi } from "chessground/api";
 import { Config as CgConfig } from "chessground/config";
-import { FEN } from "chessground/types";
 import { Color, Move, Position } from "chessops";
-import { lichessRules } from "chessops/compat";
-import { makeBoardFen, parseFen } from "chessops/fen";
+import { parseFen } from "chessops/fen";
 import { ChildNode, CommentShape, Node, PgnNodeData } from "chessops/pgn";
-import { makeSanAndPlay, makeSanVariation } from "chessops/san";
-import { Square, parseSquare, parseUci } from "chessops";
+import { makeSanVariation } from "chessops/san";
+import { Square, parseSquare } from "chessops";
 import { Chess } from "chessops/chess";
-import { setupPosition } from "chessops/variant";
-export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, makeSanAndPlay };
-export type { Color, Position, Move, FEN, Square };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground };
+export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 export type AnyNode = Node<MoveData>;
 export type Id = string;
 export type San = string;
 export type Uci = string;
 export type Ply = number;
+export interface PvMove {
+    text?: string;
+    fen?: string;
+    san?: string;
+    uci?: string;
+}
+export declare const renderMove: (ctrl: PgnViewer) => (move: MoveData, isVariation?: boolean) => string;
+export declare const moveTurn: (move: MoveData) => string;
+export declare const emptyMove: () => string;
+export declare const commentNode: (comment: string) => {
+    text: string;
+    type: string;
+};
+export declare const indexNode: (turn: number) => string;
+export declare const parenOpen: () => string;
+export declare const parenClose: () => string;
+export type MoveToDom = (move: MoveData) => string;
+export declare const makeMainVariation: (moveDom: MoveToDom, node: MoveNode) => (string | {
+    text: string;
+    type: string;
+})[];
+export declare const makeVariationMoves: (moveDom: MoveToDom, node: MoveNode) => string[];
+export declare const makeMoveNodes: (ctrl: PgnViewer) => string[];
+export declare function renderPvMoves(currentFen: string, pv: readonly string[]): PvMove[];
 export declare class Path {
     readonly path: string;
     constructor(path: string);

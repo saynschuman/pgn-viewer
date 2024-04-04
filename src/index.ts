@@ -1,7 +1,10 @@
+import { Key, FEN } from "chessground/types";
+import { Chessground } from "chessground";
+import { Role } from "chessground/types";
 import { Api as CgApi } from "chessground/api";
-import { Config as CgConfig } from "chessground/config";
-import { FEN } from "chessground/types";
 import { uciToMove } from "chessground/util";
+import { Config as CgConfig } from "chessground/config";
+
 import { Color, makeSquare, makeUci, Move, opposite, Position } from "chessops";
 import { scalachessCharPair, lichessRules } from "chessops/compat";
 import { makeFen, makeBoardFen, parseFen } from "chessops/fen";
@@ -20,18 +23,8 @@ import { Square, parseSquare, parseUci } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
 
-export {
-  Chess,
-  lichessRules,
-  makeBoardFen,
-  parseFen,
-  setupPosition,
-  parseSquare,
-  parseUci,
-  makeSanVariation,
-  makeSanAndPlay
-};
-export type { Color, Position, Move, FEN, Square };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground };
+export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 
 export type AnyNode = Node<MoveData>;
 
@@ -39,6 +32,138 @@ export type Id = string;
 export type San = string;
 export type Uci = string;
 export type Ply = number;
+
+export interface PvMove {
+  text?: string;
+  fen?: string;
+  san?: string;
+  uci?: string;
+}
+
+export const renderMove =
+  (ctrl: PgnViewer) =>
+  (move: MoveData, isVariation: boolean = false) => {
+    return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${
+      move.path.path
+    }" data-variation="${isVariation}" class="move ${
+      isVariation ? "variation" : ""
+    }" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${
+      move.san
+    } </span>`;
+  };
+
+export const moveTurn = (move: MoveData) =>
+  `${Math.floor((move.ply - 1) / 2) + 1}.`;
+export const emptyMove = () => "...";
+export const commentNode = (comment: string) => ({
+  text: comment,
+  type: "comment",
+});
+export const indexNode = (turn: number) => `${turn}`;
+export const parenOpen = () => '<span class="paren-element op">(</span>';
+export const parenClose = () => '<span class="paren-element cl">)</span>';
+
+export type MoveToDom = (move: MoveData) => string;
+
+export const makeMainVariation = (moveDom: MoveToDom, node: MoveNode) => [
+  // @ts-ignore
+  ...node.data.startingComments.map(commentNode),
+  ...makeVariationMoves(moveDom, node),
+];
+
+export const makeVariationMoves = (moveDom: MoveToDom, node: MoveNode) => {
+  let elms: string[] = [];
+  let variations: MoveNode[] = [];
+  // @ts-ignore
+  if (node.data.ply % 2 == 0) elms.push(`${moveTurn(node.data)}.. `);
+  do {
+    const move = node.data;
+    // @ts-ignore
+    if (move.ply % 2 == 1) elms.push(moveTurn(move));
+    // @ts-ignore
+    elms.push(moveDom(move));
+    // @ts-ignore
+    move.comments.forEach((comment) => elms.push(commentNode(comment)));
+    variations.forEach((variation) => {
+      elms = [
+        ...elms,
+        parenOpen(),
+        ...makeVariationMoves(moveDom, variation),
+        parenClose(),
+      ];
+    });
+    variations = node.children.slice(1);
+    node = node.children[0];
+  } while (node);
+  return elms;
+};
+
+export const makeMoveNodes = (ctrl: PgnViewer): string[] => {
+  const moveDom = renderMove(ctrl);
+  const elms: string[] = [];
+  let node: MoveNode | undefined,
+    variations = ctrl.game.moves.children.slice(1) as unknown as MoveNode[];
+  if (ctrl.game.initial.pos.turn == "black" && ctrl.game.mainline[0])
+    elms.push(indexNode(ctrl.game.initial.pos.fullmoves), emptyMove());
+  // @ts-ignore
+  while ((node = (node || ctrl.game.moves).children[0])) {
+    const move = node.data;
+    // @ts-ignore
+    const oddMove = move.ply % 2 == 1;
+    // @ts-ignore
+    if (oddMove) elms.push(indexNode(moveTurn(move)));
+    // @ts-ignore
+    elms.push(moveDom(move));
+    const addEmptyMove =
+      // @ts-ignore
+      oddMove &&
+      // @ts-ignore
+      (variations.length || move.comments.length) &&
+      node.children.length;
+    if (addEmptyMove) elms.push(emptyMove());
+    // @ts-ignore
+    move.comments.forEach((comment) => elms.push(commentNode(comment)));
+    variations.forEach((variation) =>
+      // @ts-ignore
+      elms.push(makeMainVariation((data) => moveDom(data, true), variation))
+    );
+    // @ts-ignore
+    if (addEmptyMove) elms.push(indexNode(moveTurn(move)), emptyMove());
+    variations = node.children.slice(1);
+  }
+  return elms;
+};
+
+export function renderPvMoves(
+  currentFen: string,
+  pv: readonly string[]
+): PvMove[] {
+  const position = setupPosition(
+    lichessRules("standard"),
+    parseFen(currentFen).unwrap()
+  );
+  const pos = position.unwrap();
+  const vnodes: PvMove[] = [];
+  for (let i = 0; i < pv.length; i++) {
+    let text;
+    if (pos.turn === "white") {
+      text = `${pos.fullmoves}.`;
+    } else if (i === 0) {
+      text = `${pos.fullmoves}...`;
+    }
+    if (text) {
+      vnodes.push({ text });
+    }
+    const uci = pv[i];
+    const san = makeSanAndPlay(pos, parseUci(uci)!);
+    const fen = makeBoardFen(pos.board); // Chessground uses only board fen
+    if (san === "--") {
+      break;
+    }
+    vnodes.push({ fen: `${fen}`, san, uci });
+  }
+  return vnodes;
+}
 
 export class Path {
   constructor(readonly path: string) {}
