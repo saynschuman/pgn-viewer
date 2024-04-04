@@ -23,7 +23,7 @@ import { Square, parseSquare, parseUci } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
 
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove };
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 
 export type AnyNode = Node<MoveData>;

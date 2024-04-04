@@ -8,7 +8,7 @@ import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
 import { parseSquare, parseUci } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove };
 export const renderMove = (ctrl) => (move, isVariation = false) => {
     return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };
