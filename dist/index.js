@@ -7,7 +7,7 @@ import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
 import { parseSquare, parseUci } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
-export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, };
+export { Chess, lichessRules, makeBoardFen, parseFen, setupPosition, parseSquare, parseUci, makeSanVariation, makeSanAndPlay };
 export class Path {
     constructor(path) {
         this.path = path;

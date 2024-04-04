@@ -29,6 +29,7 @@ export {
   parseSquare,
   parseUci,
   makeSanVariation,
+  makeSanAndPlay
 };
 export type { Color, Position, Move, FEN, Square };
 
