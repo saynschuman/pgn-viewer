@@ -19,11 +19,19 @@ import {
   transform,
 } from "chessops/pgn";
 import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
-import { Square, parseSquare, parseUci } from "chessops";
+import { Square, parseSquare, parseUci, charToRole } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
 
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove };
+export {
+  Chess,
+  parseFen,
+  parseSquare,
+  makeSanVariation,
+  Chessground,
+  uciToMove,
+  charToRole,
+};
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 
 export type AnyNode = Node<MoveData>;
@@ -133,6 +141,14 @@ export const makeMoveNodes = (ctrl: PgnViewer): string[] => {
   }
   return elms;
 };
+
+function isValidUci(uci: Uci) {
+  // Check for a standard move: should be in the format "e2e4", "a7a8", ...
+  if (/^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(uci)) {
+    return true;
+  }
+  return false;
+}
 
 export function renderPvMoves(
   currentFen: string,
