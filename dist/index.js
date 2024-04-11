@@ -460,10 +460,10 @@ export class PgnViewer {
         }
     }
     isCurrentPathLastOnMainline() {
-        var _a, _b;
+        var _a, _b, _c;
         // Get the path of the last move in the mainline
         const lastMainlineMovePath = (_b = (_a = this.game.mainline) === null || _a === void 0 ? void 0 : _a[this.game.mainline.length - 1]) === null || _b === void 0 ? void 0 : _b.path;
         // Compare the current path with the path of the last move in the mainline
-        return this.path.equals(lastMainlineMovePath);
+        return !!((_c = this.path) === null || _c === void 0 ? void 0 : _c.equals(lastMainlineMovePath));
     }
 }
