@@ -635,13 +635,13 @@ export class PgnViewer {
 
     return mainLinePly || altLinePly;
   };
-  isCurrentPathLastOnMainline() {
+  isCurrentPathLastOnMainline = () => {
     // Get the path of the last move in the mainline
     const lastMainlineMovePath =
-      this.game.mainline?.[this.game.mainline.length - 1]?.path;
+      this.game.mainline[this.game.mainline.length - 1].path;
     // Compare the current path with the path of the last move in the mainline
-    return !!this.path?.equals(lastMainlineMovePath);
-  }
+    return !!this.path.equals(lastMainlineMovePath);
+  };
 
   goTo = (to: GoTo, focus = true) => {
     const path =
