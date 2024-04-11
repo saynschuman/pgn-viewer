@@ -5,10 +5,10 @@ import { scalachessCharPair, lichessRules } from "chessops/compat";
 import { makeFen, makeBoardFen, parseFen } from "chessops/fen";
 import { parseComment, parsePgn, startingPosition, transform, } from "chessops/pgn";
 import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
-import { parseSquare, parseUci } from "chessops";
+import { parseSquare, parseUci, charToRole } from "chessops";
 import { Chess } from "chessops/chess";
 import { setupPosition } from "chessops/variant";
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, };
 export const renderMove = (ctrl) => (move, isVariation = false) => {
     return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };

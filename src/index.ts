@@ -142,14 +142,6 @@ export const makeMoveNodes = (ctrl: PgnViewer): string[] => {
   return elms;
 };
 
-function isValidUci(uci: Uci) {
-  // Check for a standard move: should be in the format "e2e4", "a7a8", ...
-  if (/^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(uci)) {
-    return true;
-  }
-  return false;
-}
-
 export function renderPvMoves(
   currentFen: string,
   pv: readonly string[]
