@@ -459,4 +459,11 @@ export class PgnViewer {
             this.path = Path.root;
         }
     }
+    isCurrentPathLastOnMainline() {
+        var _a;
+        // Get the path of the last move in the mainline
+        const lastMainlineMovePath = (_a = this.game.mainline[this.game.mainline.length - 1]) === null || _a === void 0 ? void 0 : _a.path;
+        // Compare the current path with the path of the last move in the mainline
+        return this.path.equals(lastMainlineMovePath);
+    }
 }

@@ -224,6 +224,7 @@ export declare class PgnViewer {
     curNode: () => AnyNode;
     curData: () => InitialOrMove;
     curPly: () => any;
+    isCurrentPathLastOnMainline(): boolean;
     goTo: (to: GoTo, focus?: boolean) => void;
     goToMoveAtFenFromUrl: () => void;
     canGoTo: (to: GoTo) => boolean;
