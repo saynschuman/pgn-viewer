@@ -636,11 +636,11 @@ export class PgnViewer {
     return mainLinePly || altLinePly;
   };
   isCurrentPathLastOnMainline = () => {
-    // Get the path of the last move in the mainline
-    const lastMainlineMovePath =
-      this.game.mainline[this.game.mainline.length - 1].path;
-    // Compare the current path with the path of the last move in the mainline
-    return !!this.path.equals(lastMainlineMovePath);
+    const lastMove = this.game.moves.end();
+    // @ts-ignore
+    if (!lastMove.data) return true;
+    // @ts-ignore
+    return this.path.equals(lastMove?.data.path);
   };
 
   goTo = (to: GoTo, focus = true) => {
