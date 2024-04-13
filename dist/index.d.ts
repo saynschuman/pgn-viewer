@@ -1,15 +1,15 @@
-import { Key, FEN } from "chessground/types";
 import { Chessground } from "chessground";
-import { Role } from "chessground/types";
 import { Api as CgApi } from "chessground/api";
-import { uciToMove } from "chessground/util";
 import { Config as CgConfig } from "chessground/config";
+import { FEN, Key } from "chessground/types";
+import { Role } from "chessground/types";
+import { uciToMove } from "chessground/util";
 import { Color, Move, Position } from "chessops";
+import { Square, charToRole, parseSquare } from "chessops";
+import { Chess } from "chessops/chess";
 import { parseFen } from "chessops/fen";
 import { ChildNode, CommentShape, Node, PgnNodeData } from "chessops/pgn";
 import { makeSanVariation } from "chessops/san";
-import { Square, parseSquare, charToRole } from "chessops";
-import { Chess } from "chessops/chess";
 export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, };
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 export type AnyNode = Node<MoveData>;
@@ -217,6 +217,7 @@ export declare class PgnViewer {
     constructor(opts: Opts);
     setAutoPlay: (autoplay: boolean) => void;
     addNode: (node: MoveNode, parentPath: string) => string | undefined;
+    deleteNode: (nodePath: string) => MoveData | null;
     addNodes: (nodes: MoveNode[], path: string) => string | undefined;
     updateAt: (parentPath: string, update: (node: MoveNode) => void) => any;
     nodeAtPathOrNull: (path: string) => any;
