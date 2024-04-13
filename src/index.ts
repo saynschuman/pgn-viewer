@@ -1,26 +1,25 @@
-import { Key, FEN } from "chessground/types";
 import { Chessground } from "chessground";
-import { Role } from "chessground/types";
 import { Api as CgApi } from "chessground/api";
-import { uciToMove } from "chessground/util";
 import { Config as CgConfig } from "chessground/config";
-
-import { Color, makeSquare, makeUci, Move, opposite, Position } from "chessops";
-import { scalachessCharPair, lichessRules } from "chessops/compat";
-import { makeFen, makeBoardFen, parseFen } from "chessops/fen";
+import { FEN, Key } from "chessground/types";
+import { Role } from "chessground/types";
+import { uciToMove } from "chessground/util";
+import { Color, Move, Position, makeSquare, makeUci, opposite } from "chessops";
+import { Square, charToRole, parseSquare, parseUci } from "chessops";
+import { Chess } from "chessops/chess";
+import { lichessRules, scalachessCharPair } from "chessops/compat";
+import { makeBoardFen, makeFen, parseFen } from "chessops/fen";
 import {
   ChildNode,
   CommentShape,
   Node,
+  PgnNodeData,
   parseComment,
   parsePgn,
-  PgnNodeData,
   startingPosition,
   transform,
 } from "chessops/pgn";
-import { makeSanAndPlay, parseSan, makeSanVariation } from "chessops/san";
-import { Square, parseSquare, parseUci, charToRole } from "chessops";
-import { Chess } from "chessops/chess";
+import { makeSanAndPlay, makeSanVariation, parseSan } from "chessops/san";
 import { setupPosition } from "chessops/variant";
 
 export {
@@ -596,6 +595,27 @@ export class PgnViewer {
       parent.children.push(node)
     );
     return updated ? newPath : undefined;
+  };
+
+  deleteNode = (nodePath: string): MoveData | null => {
+    // Split the path into the parent path and the ID of the current node.
+    const parentId = nodePath.slice(0, -2);
+    const nodeId = nodePath.slice(-2);
+
+    // Get the parent node.
+    const parentNode = this.nodeAtPathOrNull(parentId);
+    if (!parentNode) return null; // If there is no parent, there is nothing to delete.
+
+    // Find the index of the node to be deleted in the parent's children array.
+    const index = parentNode.children.findIndex(
+      (child: any) => child.data?.id === nodeId
+    );
+    if (index === -1) return null; //  Node not found.
+
+    // Remove the node from the list of children.
+    parentNode.children.splice(index, 1);
+    const mainline = Array.from(this.game.moves.mainline());
+    return mainline[mainline.length - 1]; // return the last node before the deleted one
   };
 
   addNodes = (nodes: MoveNode[], path: string): string | undefined => {
