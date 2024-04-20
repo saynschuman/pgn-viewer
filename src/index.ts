@@ -30,6 +30,8 @@ export {
   Chessground,
   uciToMove,
   charToRole,
+  parsePgn,
+  startingPosition
 };
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 
