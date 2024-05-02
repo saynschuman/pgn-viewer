@@ -582,6 +582,45 @@ export class PgnViewer {
     }
   }
 
+  public getGamePgn = (): string => {
+    const exportNode = (node: MoveNode): string => {
+      let result = "";
+      if (node.data) {
+        result += node.data.san + " ";
+        if (node.data.comments?.length) {
+          node.data.comments.forEach((comment) => {
+            result += `{ ${comment} } `;
+          });
+        }
+      }
+      if (node.children.length > 0) {
+        result += exportNode(node.children[0]); // Export the main line first
+        node.children.slice(1).forEach((child) => {
+          // Handle variations
+          result += "( ";
+          result += exportNode(child);
+          result += ") ";
+        });
+      }
+      return result;
+    };
+
+    // Start from the initial position and export from there
+    const initialComment = this.game.initial.comments
+      .map((comment) => `{ ${comment} }`)
+      .join(" ");
+    let pgn = initialComment + " ";
+    // @ts-ignore
+    pgn += exportNode(this.game.moves);
+
+    // Add the game result at the end if it exists
+    if (this.game.metadata.result) {
+      pgn += this.game.metadata.result;
+    }
+
+    return pgn.trim();
+  };
+
   setAutoPlay = (autoplay: boolean) => {
     this.autoplay = autoplay;
   };
