@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Chessground } from "chessground";
 import { uciToMove } from "chessground/util";
 import { makeSquare, makeUci, opposite } from "chessops";
@@ -8,7 +9,7 @@ import { makeBoardFen, makeFen, parseFen } from "chessops/fen";
 import { parseComment, parsePgn, startingPosition, transform, } from "chessops/pgn";
 import { makeSanAndPlay, makeSanVariation, parseSan } from "chessops/san";
 import { setupPosition } from "chessops/variant";
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition, };
 export const renderMove = (ctrl) => (move, isVariation = false) => {
     return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };
@@ -317,6 +318,33 @@ export class PgnViewer {
         this.autoplay = false;
         this.setAutoPlay = (autoplay) => {
             this.autoplay = autoplay;
+        };
+        this.addComment = (path, comment) => {
+            const node = this.nodeAtPathOrNull(path);
+            if (node && node.data) {
+                if (!node.data.comments) {
+                    node.data.comments = [];
+                }
+                node.data.comments.push(comment);
+            }
+        };
+        this.deleteComment = (path, index) => {
+            const node = this.nodeAtPathOrNull(path);
+            if (node &&
+                node.data &&
+                node.data.comments &&
+                index < node.data.comments.length) {
+                node.data.comments.splice(index, 1);
+            }
+        };
+        this.editComment = (path, index, newComment) => {
+            const node = this.nodeAtPathOrNull(path);
+            if (node &&
+                node.data &&
+                node.data.comments &&
+                index < node.data.comments.length) {
+                node.data.comments[index] = newComment;
+            }
         };
         // returns new path
         this.addNode = (node, parentPath) => {

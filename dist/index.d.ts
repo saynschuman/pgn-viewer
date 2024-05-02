@@ -10,7 +10,7 @@ import { Chess } from "chessops/chess";
 import { parseFen } from "chessops/fen";
 import { ChildNode, CommentShape, Node, PgnNodeData, parsePgn, startingPosition } from "chessops/pgn";
 import { makeSanVariation } from "chessops/san";
-export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition };
+export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition, };
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 export type AnyNode = Node<MoveData>;
 export type Id = string;
@@ -216,6 +216,9 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     setAutoPlay: (autoplay: boolean) => void;
+    addComment: (path: string, comment: string) => void;
+    deleteComment: (path: string, index: number) => void;
+    editComment: (path: string, index: number, newComment: string) => void;
     addNode: (node: MoveNode, parentPath: string) => string | undefined;
     deleteNode: (nodePath: string) => MoveData | null;
     addNodes: (nodes: MoveNode[], path: string) => string | undefined;
