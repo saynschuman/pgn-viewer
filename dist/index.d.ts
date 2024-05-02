@@ -215,6 +215,7 @@ export declare class PgnViewer {
     autoScrollRequested: boolean;
     autoplay: boolean;
     constructor(opts: Opts);
+    getGamePgn: () => string;
     setAutoPlay: (autoplay: boolean) => void;
     addComment: (path: string, comment: string) => void;
     deleteComment: (path: string, index: number) => void;
