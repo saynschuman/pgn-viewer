@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Chessground } from "chessground";
 import { Api as CgApi } from "chessground/api";
 import { Config as CgConfig } from "chessground/config";
@@ -31,7 +32,7 @@ export {
   uciToMove,
   charToRole,
   parsePgn,
-  startingPosition
+  startingPosition,
 };
 export type { Color, Position, Move, FEN, Square, Key, Role, CgConfig, CgApi };
 
@@ -583,6 +584,40 @@ export class PgnViewer {
 
   setAutoPlay = (autoplay: boolean) => {
     this.autoplay = autoplay;
+  };
+
+  addComment = (path: string, comment: string) => {
+    const node = this.nodeAtPathOrNull(path);
+    if (node && node.data) {
+      if (!node.data.comments) {
+        node.data.comments = [];
+      }
+      node.data.comments.push(comment);
+    }
+  };
+
+  deleteComment = (path: string, index: number) => {
+    const node = this.nodeAtPathOrNull(path);
+    if (
+      node &&
+      node.data &&
+      node.data.comments &&
+      index < node.data.comments.length
+    ) {
+      node.data.comments.splice(index, 1);
+    }
+  };
+
+  editComment = (path: string, index: number, newComment: string) => {
+    const node = this.nodeAtPathOrNull(path);
+    if (
+      node &&
+      node.data &&
+      node.data.comments &&
+      index < node.data.comments.length
+    ) {
+      node.data.comments[index] = newComment;
+    }
   };
 
   // returns new path
