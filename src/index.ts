@@ -612,11 +612,23 @@ export class PgnViewer {
       return result;
     };
 
+    // Format headers from the game metadata
+    const headers = [
+      ["White", this.game.players.white.name],
+      ["Black", this.game.players.black.name],
+      ["Result", this.game.metadata.result || "*"],
+      ["Comment", this.game.metadata.comment],
+    ]
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_, value]) => value !== undefined)
+      .map(([key, value]) => `[${key} "${value}"]`)
+      .join("\n");
+
     // Start from the initial position and export from there
     const initialComment = this.game.initial.comments
       .map((comment) => `{ ${comment} }`)
       .join(" ");
-    let pgn = initialComment + " ";
+    let pgn = headers + "\n\n" + initialComment + " ";
     // @ts-ignore
     pgn += exportNode(this.game.moves);
 
