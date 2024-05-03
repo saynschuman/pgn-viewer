@@ -614,8 +614,8 @@ export class PgnViewer {
 
     // Format headers from the game metadata
     const headers = [
-      ["White", this.game.players.white.name],
-      ["Black", this.game.players.black.name],
+      ["white", this.game.players.white.name],
+      ["black", this.game.players.black.name],
       ["Result", this.game.metadata.result || "*"],
       ["Comment", this.game.metadata.comment],
     ]
