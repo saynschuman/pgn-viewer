@@ -198,6 +198,7 @@ export function makeMetadata(headers, lichess) {
     var _a;
     const site = headers.get("source") || headers.get("site");
     const result = headers.get("result");
+    const comment = headers.get("comment");
     const tcs = (_a = headers
         .get("timecontrol")) === null || _a === void 0 ? void 0 : _a.split("+").map((x) => parseInt(x));
     const timeControl = tcs && tcs[0]
@@ -215,6 +216,7 @@ export function makeMetadata(headers, lichess) {
             ? orientation
             : undefined,
         result,
+        comment,
     };
 }
 export class State {
@@ -547,5 +549,8 @@ export class PgnViewer {
         else {
             this.path = Path.root;
         }
+    }
+    editGameComment(newComment) {
+        this.game.metadata.comment = newComment;
     }
 }

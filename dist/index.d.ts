@@ -169,6 +169,7 @@ export interface Metadata {
     };
     orientation?: Color;
     result?: string | null;
+    comment?: string;
 }
 export type MoveNodeType = ChildNode<MoveData>;
 export declare const isMoveNode: (n: AnyNode) => n is MoveNodeType;
@@ -215,6 +216,7 @@ export declare class PgnViewer {
     autoScrollRequested: boolean;
     autoplay: boolean;
     constructor(opts: Opts);
+    editGameComment(newComment: string): void;
     getGamePgn: () => string;
     setAutoPlay: (autoplay: boolean) => void;
     addComment: (path: string, comment: string) => void;
