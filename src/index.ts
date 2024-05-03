@@ -337,6 +337,7 @@ export interface Metadata {
   };
   orientation?: Color;
   result?: string | null;
+  comment?: string;
 }
 
 const nodeAtPathFrom = (node: AnyNode, path: Path): AnyNode | undefined => {
@@ -425,6 +426,7 @@ export type Headers = Map<string, string>;
 export function makeMetadata(headers: Headers, lichess: Lichess): Metadata {
   const site = headers.get("source") || headers.get("site");
   const result = headers.get("result");
+  const comment = headers.get("comment");
   const tcs = headers
     .get("timecontrol")
     ?.split("+")
@@ -446,6 +448,7 @@ export function makeMetadata(headers: Headers, lichess: Lichess): Metadata {
         ? orientation
         : undefined,
     result,
+    comment,
   };
 }
 
@@ -580,6 +583,10 @@ export class PgnViewer {
     } else {
       this.path = Path.root;
     }
+  }
+
+  public editGameComment(newComment: string): void {
+    this.game.metadata.comment = newComment;
   }
 
   public getGamePgn = (): string => {
