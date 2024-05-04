@@ -547,17 +547,25 @@ export class PgnViewer {
         this.game.metadata.comment = newComment;
     }
     exportNode(node, forcePly) {
-        var _a, _b;
+        var _a, _b, _c, _d, _e;
         if (node.children.length === 0)
             return "";
         let s = "";
         const first = node.children[0];
         if (forcePly || (((_a = first.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) % 2 === 1)
             s += this.plyPrefix(first);
-        s += (_b = first.data) === null || _b === void 0 ? void 0 : _b.san;
+        // Add comments before the move if they exist
+        if ((_c = (_b = first.data) === null || _b === void 0 ? void 0 : _b.comments) === null || _c === void 0 ? void 0 : _c.length) {
+            first.data.comments.forEach((comment) => {
+                s += `{ ${comment} } `;
+            });
+        }
+        s += (_d = first.data) === null || _d === void 0 ? void 0 : _d.san;
         for (let i = 1; i < node.children.length; i++) {
             const child = node.children[i];
-            s += ` (${this.plyPrefix(child)}${child.data.san}`;
+            // Add move prefix and handle comments before variations
+            s += ` (${this.plyPrefix(child)}${(_e = child
+                .data.comments) === null || _e === void 0 ? void 0 : _e.map((comment) => `{ ${comment} } `).join("")}${child.data.san}`;
             const variation = this.exportNode(child, false);
             if (variation)
                 s += " " + variation;
