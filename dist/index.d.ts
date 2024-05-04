@@ -217,6 +217,8 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     editGameComment(newComment: string): void;
+    plyPrefix: (node: MoveNode) => string;
+    exportNode(node: MoveNode, forcePly: boolean): string;
     getGamePgn: () => string;
     setAutoPlay: (autoplay: boolean) => void;
     addComment: (path: string, comment: string) => void;

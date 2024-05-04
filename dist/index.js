@@ -318,29 +318,11 @@ export class PgnViewer {
         this.pane = "board";
         this.autoScrollRequested = false;
         this.autoplay = false;
+        this.plyPrefix = (node) => {
+            var _a, _b;
+            return `${Math.floor(((((_a = node === null || node === void 0 ? void 0 : node.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) + 1) / 2)}${(((_b = node === null || node === void 0 ? void 0 : node.data) === null || _b === void 0 ? void 0 : _b.ply) || 0) % 2 === 1 ? ". " : "... "}`;
+        };
         this.getGamePgn = () => {
-            const exportNode = (node) => {
-                var _a;
-                let result = "";
-                if (node.data) {
-                    result += node.data.san + " ";
-                    if ((_a = node.data.comments) === null || _a === void 0 ? void 0 : _a.length) {
-                        node.data.comments.forEach((comment) => {
-                            result += `{ ${comment} } `;
-                        });
-                    }
-                }
-                if (node.children.length > 0) {
-                    result += exportNode(node.children[0]); // Export the main line first
-                    node.children.slice(1).forEach((child) => {
-                        // Handle variations
-                        result += "( ";
-                        result += exportNode(child);
-                        result += ") ";
-                    });
-                }
-                return result;
-            };
             // Format headers from the game metadata
             const headers = [
                 ["white", this.game.players.white.name],
@@ -358,7 +340,7 @@ export class PgnViewer {
                 .join(" ");
             let pgn = headers + "\n\n" + initialComment + " ";
             // @ts-ignore
-            pgn += exportNode(this.game.moves);
+            pgn += this.exportNode(this.game.moves);
             // Add the game result at the end if it exists
             if (this.game.metadata.result) {
                 pgn += this.game.metadata.result;
@@ -563,5 +545,27 @@ export class PgnViewer {
     }
     editGameComment(newComment) {
         this.game.metadata.comment = newComment;
+    }
+    exportNode(node, forcePly) {
+        var _a, _b;
+        if (node.children.length === 0)
+            return "";
+        let s = "";
+        const first = node.children[0];
+        if (forcePly || (((_a = first.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) % 2 === 1)
+            s += this.plyPrefix(first);
+        s += (_b = first.data) === null || _b === void 0 ? void 0 : _b.san;
+        for (let i = 1; i < node.children.length; i++) {
+            const child = node.children[i];
+            s += ` (${this.plyPrefix(child)}${child.data.san}`;
+            const variation = this.exportNode(child, false);
+            if (variation)
+                s += " " + variation;
+            s += ")";
+        }
+        const mainline = this.exportNode(first, node.children.length > 1);
+        if (mainline)
+            s += " " + mainline;
+        return s;
     }
 }
