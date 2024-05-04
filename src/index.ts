@@ -603,11 +603,22 @@ export class PgnViewer {
     const first = node.children[0];
     if (forcePly || (first.data?.ply || 0) % 2 === 1)
       s += this.plyPrefix(first);
+
+    // Add comments before the move if they exist
+    if (first.data?.comments?.length) {
+      first.data.comments.forEach((comment) => {
+        s += `{ ${comment} } `;
+      });
+    }
+
     s += first.data?.san;
 
     for (let i = 1; i < node.children.length; i++) {
       const child = node.children[i];
-      s += ` (${this.plyPrefix(child)}${child.data!.san}`;
+      // Add move prefix and handle comments before variations
+      s += ` (${this.plyPrefix(child)}${child
+        .data!.comments?.map((comment) => `{ ${comment} } `)
+        .join("")}${child.data!.san}`;
       const variation = this.exportNode(child, false);
       if (variation) s += " " + variation;
       s += ")";
