@@ -53,7 +53,9 @@ export interface PvMove {
 export const renderMove =
   (ctrl: PgnViewer) =>
   (move: MoveData, isVariation: boolean = false) => {
-    return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${
+    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${
+      move.uci
+    }" data-path="${
       move.path.path
     }" data-variation="${isVariation}" class="move ${
       isVariation ? "variation" : ""
