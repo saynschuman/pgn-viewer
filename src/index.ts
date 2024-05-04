@@ -587,6 +587,43 @@ export class PgnViewer {
     }
   }
 
+  public deleteMovesAfterPath(path: string): void {
+    const node = this.nodeAtPathOrNull(path);
+    if (node && node.children) {
+      node.children = []; // Очистить всех потомков узла
+    }
+  }
+
+  public deleteMoveAndAllFollowing(path: string): void {
+    if (path.length < 2) {
+      console.error("Invalid path provided");
+      return;
+    }
+
+    // Получаем родительский путь, удаляя последние 2 символа из текущего пути
+    const parentPath = path.substring(0, path.length - 2);
+    const nodeId = path.substring(path.length - 2, path.length);
+
+    // Находим родительский узел
+    const parentNode = this.nodeAtPathOrNull(parentPath);
+    if (!parentNode || !parentNode.children) {
+      console.error("Parent node not found or no children exist");
+      return;
+    }
+
+    // Находим индекс выбранного узла в массиве детей
+    const index = parentNode.children.findIndex(
+      (child: any) => child.data?.id === nodeId
+    );
+    if (index === -1) {
+      console.error("Node not found in parent's children");
+      return;
+    }
+
+    // Удаляем выбранный узел и все следующие узлы
+    parentNode.children.splice(index);
+  }
+
   public editGameComment(newComment: string): void {
     this.game.metadata.comment = newComment;
   }
