@@ -591,29 +591,35 @@ export class PgnViewer {
     this.game.metadata.comment = newComment;
   }
 
-  public getGamePgn = (): string => {
-    const exportNode = (node: MoveNode): string => {
-      let result = "";
-      if (node.data) {
-        result += node.data.san + " ";
-        if (node.data.comments?.length) {
-          node.data.comments.forEach((comment) => {
-            result += `{ ${comment} } `;
-          });
-        }
-      }
-      if (node.children.length > 0) {
-        result += exportNode(node.children[0]); // Export the main line first
-        node.children.slice(1).forEach((child) => {
-          // Handle variations
-          result += "( ";
-          result += exportNode(child);
-          result += ") ";
-        });
-      }
-      return result;
-    };
+  public plyPrefix = (node: MoveNode): string =>
+    `${Math.floor(((node?.data?.ply || 0) + 1) / 2)}${
+      (node?.data?.ply || 0) % 2 === 1 ? ". " : "... "
+    }`;
 
+  public exportNode(node: MoveNode, forcePly: boolean): string {
+    if (node.children.length === 0) return "";
+
+    let s = "";
+    const first = node.children[0];
+    if (forcePly || (first.data?.ply || 0) % 2 === 1)
+      s += this.plyPrefix(first);
+    s += first.data?.san;
+
+    for (let i = 1; i < node.children.length; i++) {
+      const child = node.children[i];
+      s += ` (${this.plyPrefix(child)}${child.data!.san}`;
+      const variation = this.exportNode(child, false);
+      if (variation) s += " " + variation;
+      s += ")";
+    }
+
+    const mainline = this.exportNode(first, node.children.length > 1);
+    if (mainline) s += " " + mainline;
+
+    return s;
+  }
+
+  public getGamePgn = (): string => {
     // Format headers from the game metadata
     const headers = [
       ["white", this.game.players.white.name],
@@ -632,7 +638,7 @@ export class PgnViewer {
       .join(" ");
     let pgn = headers + "\n\n" + initialComment + " ";
     // @ts-ignore
-    pgn += exportNode(this.game.moves);
+    pgn += this.exportNode(this.game.moves);
 
     // Add the game result at the end if it exists
     if (this.game.metadata.result) {
