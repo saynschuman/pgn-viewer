@@ -216,6 +216,8 @@ export declare class PgnViewer {
     autoScrollRequested: boolean;
     autoplay: boolean;
     constructor(opts: Opts);
+    deleteMovesAfterPath(path: string): void;
+    deleteMoveAndAllFollowing(path: string): void;
     editGameComment(newComment: string): void;
     plyPrefix: (node: MoveNode) => string;
     exportNode(node: MoveNode, forcePly: boolean): string;

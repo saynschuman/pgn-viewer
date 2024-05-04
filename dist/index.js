@@ -543,6 +543,35 @@ export class PgnViewer {
             this.path = Path.root;
         }
     }
+    deleteMovesAfterPath(path) {
+        const node = this.nodeAtPathOrNull(path);
+        if (node && node.children) {
+            node.children = []; // Очистить всех потомков узла
+        }
+    }
+    deleteMoveAndAllFollowing(path) {
+        if (path.length < 2) {
+            console.error("Invalid path provided");
+            return;
+        }
+        // Получаем родительский путь, удаляя последние 2 символа из текущего пути
+        const parentPath = path.substring(0, path.length - 2);
+        const nodeId = path.substring(path.length - 2, path.length);
+        // Находим родительский узел
+        const parentNode = this.nodeAtPathOrNull(parentPath);
+        if (!parentNode || !parentNode.children) {
+            console.error("Parent node not found or no children exist");
+            return;
+        }
+        // Находим индекс выбранного узла в массиве детей
+        const index = parentNode.children.findIndex((child) => { var _a; return ((_a = child.data) === null || _a === void 0 ? void 0 : _a.id) === nodeId; });
+        if (index === -1) {
+            console.error("Node not found in parent's children");
+            return;
+        }
+        // Удаляем выбранный узел и все следующие узлы
+        parentNode.children.splice(index);
+    }
     editGameComment(newComment) {
         this.game.metadata.comment = newComment;
     }
