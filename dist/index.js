@@ -11,7 +11,7 @@ import { makeSanAndPlay, makeSanVariation, parseSan } from "chessops/san";
 import { setupPosition } from "chessops/variant";
 export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition, };
 export const renderMove = (ctrl) => (move, isVariation = false) => {
-    return `<span data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
+    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };
 export const moveTurn = (move) => `${Math.floor((move.ply - 1) / 2) + 1}.`;
 export const emptyMove = () => "...";
