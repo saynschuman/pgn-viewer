@@ -583,18 +583,18 @@ export class PgnViewer {
         const first = node.children[0];
         if (forcePly || (((_a = first.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) % 2 === 1)
             s += this.plyPrefix(first);
-        // Add comments before the move if they exist
-        if ((_c = (_b = first.data) === null || _b === void 0 ? void 0 : _b.comments) === null || _c === void 0 ? void 0 : _c.length) {
+        s += (_b = first.data) === null || _b === void 0 ? void 0 : _b.san;
+        // Add comments after the move if they exist
+        if ((_d = (_c = first.data) === null || _c === void 0 ? void 0 : _c.comments) === null || _d === void 0 ? void 0 : _d.length) {
             first.data.comments.forEach((comment) => {
-                s += `{ ${comment} } `;
+                s += ` { ${comment} } `;
             });
         }
-        s += (_d = first.data) === null || _d === void 0 ? void 0 : _d.san;
         for (let i = 1; i < node.children.length; i++) {
             const child = node.children[i];
             // Add move prefix and handle comments before variations
-            s += ` (${this.plyPrefix(child)}${(_e = child
-                .data.comments) === null || _e === void 0 ? void 0 : _e.map((comment) => `{ ${comment} } `).join("")}${child.data.san}`;
+            s += ` (${this.plyPrefix(child)}${child.data.san}${(_e = child
+                .data.comments) === null || _e === void 0 ? void 0 : _e.map((comment) => `{ ${comment} } `).join("")}`;
             const variation = this.exportNode(child, false);
             if (variation)
                 s += " " + variation;
