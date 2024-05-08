@@ -641,21 +641,21 @@ export class PgnViewer {
     if (forcePly || (first.data?.ply || 0) % 2 === 1)
       s += this.plyPrefix(first);
 
-    // Add comments before the move if they exist
+    s += first.data?.san;
+
+    // Add comments after the move if they exist
     if (first.data?.comments?.length) {
       first.data.comments.forEach((comment) => {
-        s += `{ ${comment} } `;
+        s += ` { ${comment} } `;
       });
     }
-
-    s += first.data?.san;
 
     for (let i = 1; i < node.children.length; i++) {
       const child = node.children[i];
       // Add move prefix and handle comments before variations
-      s += ` (${this.plyPrefix(child)}${child
+      s += ` (${this.plyPrefix(child)}${child.data!.san}${child
         .data!.comments?.map((comment) => `{ ${comment} } `)
-        .join("")}${child.data!.san}`;
+        .join("")}`;
       const variation = this.exportNode(child, false);
       if (variation) s += " " + variation;
       s += ")";
