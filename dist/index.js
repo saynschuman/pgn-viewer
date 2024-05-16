@@ -10,8 +10,22 @@ import { parseComment, parsePgn, startingPosition, transform, } from "chessops/p
 import { makeSanAndPlay, makeSanVariation, parseSan } from "chessops/san";
 import { setupPosition } from "chessops/variant";
 export { Chess, parseFen, parseSquare, makeSanVariation, Chessground, uciToMove, charToRole, parsePgn, startingPosition, };
+const symbolClass = (move) => {
+    const classes = {
+        good: move.nags.includes(1),
+        mistake: move.nags.includes(2),
+        brilliant: move.nags.includes(3),
+        blunder: move.nags.includes(4),
+        interesting: move.nags.includes(5),
+        inaccuracy: move.nags.includes(6),
+    };
+    return Object.keys(classes)
+        .filter((key) => classes[key])
+        .join(" ");
+};
+const hasSymbol = (move) => move.nags.length > 0 ? "with-symbol" : "";
 export const renderMove = (ctrl) => (move, isVariation = false) => {
-    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
+    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${hasSymbol(move)} ${symbolClass(move)} ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };
 export const moveTurn = (move) => `${Math.floor((move.ply - 1) / 2) + 1}.`;
 export const emptyMove = () => "...";
@@ -318,6 +332,35 @@ export class PgnViewer {
         this.pane = "board";
         this.autoScrollRequested = false;
         this.autoplay = false;
+        /**
+         * Adds a Numeric Annotation Glyph (NAG) to the specified move.
+         * @param path The path to the move where the NAG should be added.
+         * @param nag The NAG number to add.
+         */
+        this.addNag = (path, nag) => {
+            const node = this.nodeAtPathOrNull(path);
+            if (node && node.data) {
+                const nags = node.data.nags;
+                if (!nags.includes(nag)) {
+                    nags.push(nag);
+                }
+            }
+        };
+        /**
+         * Removes a Numeric Annotation Glyph (NAG) from the specified move.
+         * @param path The path to the move where the NAG should be removed.
+         * @param nag The NAG number to remove.
+         */
+        this.removeNag = (path, nag) => {
+            const node = this.nodeAtPathOrNull(path);
+            if (node && node.data) {
+                const nags = node.data.nags;
+                const index = nags.indexOf(nag);
+                if (index !== -1) {
+                    nags.splice(index, 1);
+                }
+            }
+        };
         this.plyPrefix = (node) => {
             var _a, _b;
             return `${Math.floor(((((_a = node === null || node === void 0 ? void 0 : node.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) + 1) / 2)}${(((_b = node === null || node === void 0 ? void 0 : node.data) === null || _b === void 0 ? void 0 : _b.ply) || 0) % 2 === 1 ? ". " : "... "}`;

@@ -216,6 +216,18 @@ export declare class PgnViewer {
     autoScrollRequested: boolean;
     autoplay: boolean;
     constructor(opts: Opts);
+    /**
+     * Adds a Numeric Annotation Glyph (NAG) to the specified move.
+     * @param path The path to the move where the NAG should be added.
+     * @param nag The NAG number to add.
+     */
+    addNag: (path: string, nag: number) => void;
+    /**
+     * Removes a Numeric Annotation Glyph (NAG) from the specified move.
+     * @param path The path to the move where the NAG should be removed.
+     * @param nag The NAG number to remove.
+     */
+    removeNag: (path: string, nag: number) => void;
     deleteMovesAfterPath(path: string): void;
     deleteMoveAndAllFollowing(path: string): void;
     editGameComment(newComment: string): void;
