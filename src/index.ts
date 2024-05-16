@@ -50,6 +50,23 @@ export interface PvMove {
   uci?: string;
 }
 
+const symbolClass = (move: MoveData) => {
+  const classes: { [key: string]: boolean } = {
+    good: move.nags.includes(1),
+    mistake: move.nags.includes(2),
+    brilliant: move.nags.includes(3),
+    blunder: move.nags.includes(4),
+    interesting: move.nags.includes(5),
+    inaccuracy: move.nags.includes(6),
+  };
+  return Object.keys(classes)
+    .filter((key) => classes[key])
+    .join(" ");
+};
+
+const hasSymbol = (move: MoveData) =>
+  move.nags.length > 0 ? "with-symbol" : "";
+
 export const renderMove =
   (ctrl: PgnViewer) =>
   (move: MoveData, isVariation: boolean = false) => {
@@ -57,11 +74,11 @@ export const renderMove =
       move.uci
     }" data-path="${
       move.path.path
-    }" data-variation="${isVariation}" class="move ${
-      isVariation ? "variation" : ""
-    }" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${
-      move.san
-    } </span>`;
+    }" data-variation="${isVariation}" class="move ${hasSymbol(
+      move
+    )} ${symbolClass(move)} ${isVariation ? "variation" : ""}" id="${
+      ctrl.path.path === move.path.path ? "active" : ""
+    }"> ${move.san} </span>`;
   };
 
 export const moveTurn = (move: MoveData) =>
@@ -586,6 +603,37 @@ export class PgnViewer {
       this.path = Path.root;
     }
   }
+
+  /**
+   * Adds a Numeric Annotation Glyph (NAG) to the specified move.
+   * @param path The path to the move where the NAG should be added.
+   * @param nag The NAG number to add.
+   */
+  addNag = (path: string, nag: number) => {
+    const node = this.nodeAtPathOrNull(path);
+    if (node && node.data) {
+      const nags = node.data.nags;
+      if (!nags.includes(nag)) {
+        nags.push(nag);
+      }
+    }
+  };
+
+  /**
+   * Removes a Numeric Annotation Glyph (NAG) from the specified move.
+   * @param path The path to the move where the NAG should be removed.
+   * @param nag The NAG number to remove.
+   */
+  removeNag = (path: string, nag: number) => {
+    const node = this.nodeAtPathOrNull(path);
+    if (node && node.data) {
+      const nags = node.data.nags;
+      const index = nags.indexOf(nag);
+      if (index !== -1) {
+        nags.splice(index, 1);
+      }
+    }
+  };
 
   public deleteMovesAfterPath(path: string): void {
     const node = this.nodeAtPathOrNull(path);
