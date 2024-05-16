@@ -266,15 +266,10 @@ export interface ChessMove {
   check: boolean;
   comments?: string[];
   startingComments?: string[];
-  nags?: Nag[];
+  nags?: number[];
   shapes?: Shape[];
   clocks?: Clocks;
   id: string;
-}
-
-interface Nag {
-  symbol: string;
-  description?: string;
 }
 
 interface Shape {
@@ -681,6 +676,21 @@ export class PgnViewer {
       (node?.data?.ply || 0) % 2 === 1 ? ". " : "... "
     }`;
 
+  /**
+   * Converts a list of NAGs to the standard PGN notation.
+   * @param nags Array of NAG numbers.
+   * @returns Formatted string with NAGs for PGN.
+   */
+  private formatNags(nags: number[]): string {
+    return nags.map((nag) => `$${nag}`).join(" ");
+  }
+
+  /**
+   * Recursive function to format a node and its children into PGN notation.
+   * @param node The current node in the move tree.
+   * @param forcePly Indicates whether to force the ply number at the start of this line.
+   * @returns Formatted PGN string for the node and its children.
+   */
   public exportNode(node: MoveNode, forcePly: boolean): string {
     if (node.children.length === 0) return "";
 
@@ -690,6 +700,11 @@ export class PgnViewer {
       s += this.plyPrefix(first);
 
     s += first.data?.san;
+
+    // Append NAGs if any
+    if (first.data?.nags?.length) {
+      s += ` ${this.formatNags(first.data.nags)}`;
+    }
 
     // Add comments after the move if they exist
     if (first.data?.comments?.length) {
@@ -701,9 +716,9 @@ export class PgnViewer {
     for (let i = 1; i < node.children.length; i++) {
       const child = node.children[i];
       // Add move prefix and handle comments before variations
-      s += ` (${this.plyPrefix(child)}${child.data!.san}${child
-        .data!.comments?.map((comment) => `{ ${comment} } `)
-        .join("")}`;
+      s += ` (${this.plyPrefix(child)}${child.data!.san}${
+        child.data!.nags?.length ? ` ${this.formatNags(child.data!.nags)}` : ""
+      }${child.data!.comments?.map((comment) => `{${comment}} `).join("")}`;
       const variation = this.exportNode(child, false);
       if (variation) s += " " + variation;
       s += ")";
