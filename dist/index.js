@@ -618,8 +618,22 @@ export class PgnViewer {
     editGameComment(newComment) {
         this.game.metadata.comment = newComment;
     }
+    /**
+     * Converts a list of NAGs to the standard PGN notation.
+     * @param nags Array of NAG numbers.
+     * @returns Formatted string with NAGs for PGN.
+     */
+    formatNags(nags) {
+        return nags.map((nag) => `$${nag}`).join(" ");
+    }
+    /**
+     * Recursive function to format a node and its children into PGN notation.
+     * @param node The current node in the move tree.
+     * @param forcePly Indicates whether to force the ply number at the start of this line.
+     * @returns Formatted PGN string for the node and its children.
+     */
     exportNode(node, forcePly) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         if (node.children.length === 0)
             return "";
         let s = "";
@@ -627,8 +641,12 @@ export class PgnViewer {
         if (forcePly || (((_a = first.data) === null || _a === void 0 ? void 0 : _a.ply) || 0) % 2 === 1)
             s += this.plyPrefix(first);
         s += (_b = first.data) === null || _b === void 0 ? void 0 : _b.san;
+        // Append NAGs if any
+        if ((_d = (_c = first.data) === null || _c === void 0 ? void 0 : _c.nags) === null || _d === void 0 ? void 0 : _d.length) {
+            s += ` ${this.formatNags(first.data.nags)}`;
+        }
         // Add comments after the move if they exist
-        if ((_d = (_c = first.data) === null || _c === void 0 ? void 0 : _c.comments) === null || _d === void 0 ? void 0 : _d.length) {
+        if ((_f = (_e = first.data) === null || _e === void 0 ? void 0 : _e.comments) === null || _f === void 0 ? void 0 : _f.length) {
             first.data.comments.forEach((comment) => {
                 s += ` { ${comment} } `;
             });
@@ -636,8 +654,7 @@ export class PgnViewer {
         for (let i = 1; i < node.children.length; i++) {
             const child = node.children[i];
             // Add move prefix and handle comments before variations
-            s += ` (${this.plyPrefix(child)}${child.data.san}${(_e = child
-                .data.comments) === null || _e === void 0 ? void 0 : _e.map((comment) => `{ ${comment} } `).join("")}`;
+            s += ` (${this.plyPrefix(child)}${child.data.san}${((_g = child.data.nags) === null || _g === void 0 ? void 0 : _g.length) ? ` ${this.formatNags(child.data.nags)}` : ""}${(_h = child.data.comments) === null || _h === void 0 ? void 0 : _h.map((comment) => `{${comment}} `).join("")}`;
             const variation = this.exportNode(child, false);
             if (variation)
                 s += " " + variation;

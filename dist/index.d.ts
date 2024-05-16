@@ -98,14 +98,10 @@ export interface ChessMove {
     check: boolean;
     comments?: string[];
     startingComments?: string[];
-    nags?: Nag[];
+    nags?: number[];
     shapes?: Shape[];
     clocks?: Clocks;
     id: string;
-}
-interface Nag {
-    symbol: string;
-    description?: string;
 }
 interface Shape {
     type: string;
@@ -232,6 +228,18 @@ export declare class PgnViewer {
     deleteMoveAndAllFollowing(path: string): void;
     editGameComment(newComment: string): void;
     plyPrefix: (node: MoveNode) => string;
+    /**
+     * Converts a list of NAGs to the standard PGN notation.
+     * @param nags Array of NAG numbers.
+     * @returns Formatted string with NAGs for PGN.
+     */
+    private formatNags;
+    /**
+     * Recursive function to format a node and its children into PGN notation.
+     * @param node The current node in the move tree.
+     * @param forcePly Indicates whether to force the ply number at the start of this line.
+     * @returns Formatted PGN string for the node and its children.
+     */
     exportNode(node: MoveNode, forcePly: boolean): string;
     getGamePgn: () => string;
     setAutoPlay: (autoplay: boolean) => void;
