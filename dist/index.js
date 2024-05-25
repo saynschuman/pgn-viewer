@@ -586,6 +586,65 @@ export class PgnViewer {
             this.path = Path.root;
         }
     }
+    /**
+     * Makes the given variation the mainline.
+     * @param variationPath The path to the variation to make main.
+     */
+    makeVariationMain(variationPath) {
+        const variationNode = this.nodeAtPathOrNull(variationPath);
+        if (!variationNode || !variationNode.data) {
+            console.error("Invalid variation path or node not found");
+            return;
+        }
+        // Get the parent node of the variation
+        const parentPath = variationPath.slice(0, -2);
+        const parentNode = this.nodeAtPathOrNull(parentPath);
+        if (!parentNode || !parentNode.children) {
+            console.error("Parent node not found or no children exist");
+            return;
+        }
+        // Find the index of the variation node in the parent's children
+        const variationIndex = parentNode.children.findIndex((child) => { var _a; return ((_a = child.data) === null || _a === void 0 ? void 0 : _a.id) === variationNode.data.id; });
+        if (variationIndex === -1) {
+            console.error("Variation node not found in parent's children");
+            return;
+        }
+        // Remove the variation node from its current position
+        const [removedNode] = parentNode.children.splice(variationIndex, 1);
+        // Insert the removed node at the first position in the parent's children
+        parentNode.children.unshift(removedNode);
+        // Optionally, adjust the path to point to the new mainline move
+        this.path = new Path(parentPath + removedNode.data.id);
+    }
+    /**
+     * Makes the mainline an alternative variation.
+     * @param newMainPath The path to the new mainline move.
+     */
+    makeMainlineAlternative(newMainPath) {
+        const newMainNode = this.nodeAtPathOrNull(newMainPath);
+        if (!newMainNode || !newMainNode.data) {
+            console.error("Invalid new mainline path or node not found");
+            return;
+        }
+        // Get the parent node of the new mainline move
+        const parentPath = newMainPath.slice(0, -2);
+        const parentNode = this.nodeAtPathOrNull(parentPath);
+        if (!parentNode || !parentNode.children) {
+            console.error("Parent node not found or no children exist");
+            return;
+        }
+        // Find the index of the new mainline node in the parent's children
+        const newMainIndex = parentNode.children.findIndex((child) => { var _a; return ((_a = child.data) === null || _a === void 0 ? void 0 : _a.id) === newMainNode.data.id; });
+        if (newMainIndex === -1) {
+            console.error("New mainline node not found in parent's children");
+            return;
+        }
+        // Swap the mainline node with the new mainline node
+        const [mainlineNode] = parentNode.children.splice(0, 1);
+        parentNode.children.splice(newMainIndex, 0, mainlineNode);
+        // Optionally, adjust the path to point to the new mainline move
+        this.path = new Path(parentPath + newMainNode.data.id);
+    }
     deleteMovesAfterPath(path) {
         const node = this.nodeAtPathOrNull(path);
         if (node && node.children) {

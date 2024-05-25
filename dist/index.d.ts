@@ -213,6 +213,16 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+     * Makes the given variation the mainline.
+     * @param variationPath The path to the variation to make main.
+     */
+    makeVariationMain(variationPath: string): void;
+    /**
+     * Makes the mainline an alternative variation.
+     * @param newMainPath The path to the new mainline move.
+     */
+    makeMainlineAlternative(newMainPath: string): void;
+    /**
      * Adds a Numeric Annotation Glyph (NAG) to the specified move.
      * @param path The path to the move where the NAG should be added.
      * @param nag The NAG number to add.
