@@ -213,15 +213,10 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
-     * Makes the given variation the mainline.
-     * @param variationPath The path to the variation to make main.
+     * Promotes a variation
+     * @param variationPath The path to the variation.
      */
-    makeVariationMain(variationPath: string): void;
-    /**
-     * Makes the mainline an alternative variation.
-     * @param newMainPath The path to the new mainline move.
-     */
-    makeMainlineAlternative(newMainPath: string): void;
+    promoteVariation(variationPath: string): void;
     /**
      * Adds a Numeric Annotation Glyph (NAG) to the specified move.
      * @param path The path to the move where the NAG should be added.
@@ -267,6 +262,7 @@ export declare class PgnViewer {
     curPly: () => any;
     isCurrentPathLastOnMainline: () => boolean;
     goTo: (to: GoTo, focus?: boolean) => void;
+    isPathOnMainLine: (path: string) => boolean;
     goToMoveAtFenFromUrl: () => void;
     canGoTo: (to: GoTo) => boolean;
     toPath: (path: Path, focus?: boolean) => void;
