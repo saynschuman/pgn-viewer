@@ -600,10 +600,10 @@ export class PgnViewer {
   }
 
   /**
-   * Makes the given variation the mainline.
-   * @param variationPath The path to the variation to make main.
+   * Promotes a variation
+   * @param variationPath The path to the variation.
    */
-  makeVariationMain(variationPath: string) {
+  promoteVariation(variationPath: string) {
     const variationNode = this.nodeAtPathOrNull(variationPath);
     if (!variationNode || !variationNode.data) {
       console.error("Invalid variation path or node not found");
@@ -635,42 +635,6 @@ export class PgnViewer {
 
     // Optionally, adjust the path to point to the new mainline move
     this.path = new Path(parentPath + removedNode.data.id);
-  }
-
-  /**
-   * Makes the mainline an alternative variation.
-   * @param newMainPath The path to the new mainline move.
-   */
-  makeMainlineAlternative(newMainPath: string) {
-    const newMainNode = this.nodeAtPathOrNull(newMainPath);
-    if (!newMainNode || !newMainNode.data) {
-      console.error("Invalid new mainline path or node not found");
-      return;
-    }
-
-    // Get the parent node of the new mainline move
-    const parentPath = newMainPath.slice(0, -2);
-    const parentNode = this.nodeAtPathOrNull(parentPath);
-    if (!parentNode || !parentNode.children) {
-      console.error("Parent node not found or no children exist");
-      return;
-    }
-
-    // Find the index of the new mainline node in the parent's children
-    const newMainIndex = parentNode.children.findIndex(
-      (child: any) => child.data?.id === newMainNode.data.id
-    );
-    if (newMainIndex === -1) {
-      console.error("New mainline node not found in parent's children");
-      return;
-    }
-
-    // Swap the mainline node with the new mainline node
-    const [mainlineNode] = parentNode.children.splice(0, 1);
-    parentNode.children.splice(newMainIndex, 0, mainlineNode);
-
-    // Optionally, adjust the path to point to the new mainline move
-    this.path = new Path(parentPath + newMainNode.data.id);
   }
 
   /**
@@ -961,6 +925,13 @@ export class PgnViewer {
         ? this.game.nodeAt(this.path)?.children[0]?.data.path
         : this.game.pathAtMainlinePly("last");
     this.toPath(path || this.path, focus);
+  };
+
+  isPathOnMainLine = (path: string) => {
+    const mainlinePaths = Array.from(this.game.moves.mainline()).map(
+      (m) => m.path.path
+    );
+    return mainlinePaths.includes(path);
   };
 
   goToMoveAtFenFromUrl = () => {
