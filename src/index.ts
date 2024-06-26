@@ -603,38 +603,82 @@ export class PgnViewer {
    * Promotes a variation
    * @param variationPath The path to the variation.
    */
-  promoteVariation(variationPath: string) {
-    const variationNode = this.nodeAtPathOrNull(variationPath);
+  public promoteVariation(variationPath: string) {
+    const lastNodeToAddComment = this.game.moves.end()
+    const variationNode = this.nodeAtPathOrNull(variationPath)
     if (!variationNode || !variationNode.data) {
-      console.error("Invalid variation path or node not found");
-      return;
+      console.error('Invalid variation path or node not found')
+      return
     }
 
     // Get the parent node of the variation
-    const parentPath = variationPath.slice(0, -2);
-    const parentNode = this.nodeAtPathOrNull(parentPath);
+    const parentPath = variationPath.slice(0, -2)
+    const parentNode = this.nodeAtPathOrNull(parentPath)
     if (!parentNode || !parentNode.children) {
-      console.error("Parent node not found or no children exist");
-      return;
+      console.error('Parent node not found or no children exist')
+      return
     }
 
     // Find the index of the variation node in the parent's children
     const variationIndex = parentNode.children.findIndex(
-      (child: any) => child.data?.id === variationNode.data.id
-    );
+      (child: any) => child.data?.id === variationNode.data.id,
+    )
     if (variationIndex === -1) {
-      console.error("Variation node not found in parent's children");
-      return;
+      console.error("Variation node not found in parent's children")
+      return
     }
 
     // Remove the variation node from its current position
-    const [removedNode] = parentNode.children.splice(variationIndex, 1);
+    const [removedNode] = parentNode.children.splice(variationIndex, 1)
 
     // Insert the removed node at the first position in the parent's children
-    parentNode.children.unshift(removedNode);
+    parentNode.children.unshift(removedNode)
 
     // Optionally, adjust the path to point to the new mainline move
-    this.path = new Path(parentPath + removedNode.data.id);
+    this.path = new Path(parentPath + removedNode.data.id)
+
+    // Update game result
+    const mainlineResult = this.game.metadata.result
+    if (mainlineResult) {
+      // Add mainline result to the last move of the alternative line
+      // @ts-ignore
+      if (lastNodeToAddComment && lastNodeToAddComment.data) {
+        // @ts-ignore
+        const newComments = [...lastNodeToAddComment.data.comments, `Result: ${mainlineResult}`]
+        // @ts-ignore
+        lastNodeToAddComment.data = {
+          // @ts-ignore
+          ...lastNodeToAddComment.data,
+          comments: newComments,
+        }
+        this.game.metadata.result = '*'
+      }
+    }
+    // Function to find the last node in a line
+    const findLastNode = (node: AnyNode): AnyNode => {
+      while (node.children.length > 0) {
+        node = node.children[0]
+      }
+      return node
+    }
+
+    // Update the game's result to the result of the new mainline
+    const newMainlineLastNode = findLastNode(removedNode)
+    // @ts-ignore
+    const newMainlineResult = newMainlineLastNode.data?.comments.find((comment: any) => {
+      return comment.startsWith('Result:')
+    })
+    if (newMainlineResult) {
+      this.game.metadata.result = newMainlineResult.replace('Result: ', '')
+    }
+
+    // clear all comments in mainline
+    const mainlineNodes = Array.from(this.game.moves.mainline())
+    mainlineNodes.forEach((node) => {
+      if (node) {
+        node.comments = []
+      }
+    })
   }
 
   /**
