@@ -595,16 +595,18 @@ export class PgnViewer {
      * @param variationPath The path to the variation.
      */
     promoteVariation(variationPath) {
+        var _a;
+        const lastNodeToAddComment = this.game.moves.end();
         const variationNode = this.nodeAtPathOrNull(variationPath);
         if (!variationNode || !variationNode.data) {
-            console.error("Invalid variation path or node not found");
+            console.error('Invalid variation path or node not found');
             return;
         }
         // Get the parent node of the variation
         const parentPath = variationPath.slice(0, -2);
         const parentNode = this.nodeAtPathOrNull(parentPath);
         if (!parentNode || !parentNode.children) {
-            console.error("Parent node not found or no children exist");
+            console.error('Parent node not found or no children exist');
             return;
         }
         // Find the index of the variation node in the parent's children
@@ -619,6 +621,46 @@ export class PgnViewer {
         parentNode.children.unshift(removedNode);
         // Optionally, adjust the path to point to the new mainline move
         this.path = new Path(parentPath + removedNode.data.id);
+        // Update game result
+        const mainlineResult = this.game.metadata.result;
+        if (mainlineResult) {
+            // Add mainline result to the last move of the alternative line
+            // @ts-ignore
+            if (lastNodeToAddComment && lastNodeToAddComment.data) {
+                // @ts-ignore
+                const newComments = [...lastNodeToAddComment.data.comments, `Result: ${mainlineResult}`];
+                // @ts-ignore
+                lastNodeToAddComment.data = {
+                    // @ts-ignore
+                    ...lastNodeToAddComment.data,
+                    comments: newComments,
+                };
+                this.game.metadata.result = '*';
+            }
+        }
+        // Function to find the last node in a line
+        const findLastNode = (node) => {
+            while (node.children.length > 0) {
+                node = node.children[0];
+            }
+            return node;
+        };
+        // Update the game's result to the result of the new mainline
+        const newMainlineLastNode = findLastNode(removedNode);
+        // @ts-ignore
+        const newMainlineResult = (_a = newMainlineLastNode.data) === null || _a === void 0 ? void 0 : _a.comments.find((comment) => {
+            return comment.startsWith('Result:');
+        });
+        if (newMainlineResult) {
+            this.game.metadata.result = newMainlineResult.replace('Result: ', '');
+        }
+        // clear all comments in mainline
+        const mainlineNodes = Array.from(this.game.moves.mainline());
+        mainlineNodes.forEach((node) => {
+            if (node) {
+                node.comments = [];
+            }
+        });
     }
     deleteMovesAfterPath(path) {
         const node = this.nodeAtPathOrNull(path);
