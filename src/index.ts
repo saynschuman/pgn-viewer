@@ -70,9 +70,9 @@ const hasSymbol = (move: MoveData) =>
 export const renderMove =
   (ctrl: PgnViewer) =>
   (move: MoveData, isVariation: boolean = false) => {
-    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${
-      move.uci
-    }" data-path="${
+    return `<span data-ply="${move.ply}" data-nags="${move.nags}" data-fen="${
+      move.fen
+    }" data-uci="${move.uci}" data-path="${
       move.path.path
     }" data-variation="${isVariation}" class="move ${hasSymbol(
       move
