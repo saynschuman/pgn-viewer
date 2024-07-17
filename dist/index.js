@@ -25,7 +25,7 @@ const symbolClass = (move) => {
 };
 const hasSymbol = (move) => move.nags.length > 0 ? "with-symbol" : "";
 export const renderMove = (ctrl) => (move, isVariation = false) => {
-    return `<span data-ply="${move.ply}" data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${hasSymbol(move)} ${symbolClass(move)} ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
+    return `<span data-ply="${move.ply}" data-nags="${move.nags}" data-fen="${move.fen}" data-uci="${move.uci}" data-path="${move.path.path}" data-variation="${isVariation}" class="move ${hasSymbol(move)} ${symbolClass(move)} ${isVariation ? "variation" : ""}" id="${ctrl.path.path === move.path.path ? "active" : ""}"> ${move.san} </span>`;
 };
 export const moveTurn = (move) => `${Math.floor((move.ply - 1) / 2) + 1}.`;
 export const emptyMove = () => "...";
