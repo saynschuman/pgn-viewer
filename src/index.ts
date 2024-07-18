@@ -228,6 +228,16 @@ export interface InitialOrMove {
   comments: string[];
   shapes: CommentShape[];
   clocks: Clocks;
+  path?: {
+    path: string
+  }
+  ply?: number
+  id?: string
+  move?: Move
+  san?: San
+  uci?: Uci
+  startingComments?: string[]
+  nags?: number[]
 }
 
 export interface MoveData extends InitialOrMove {
