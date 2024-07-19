@@ -223,6 +223,15 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+     * Recursively removes comments and NAGs from all nodes.
+     * @param node The node from which to remove comments and NAGs.
+     */
+    removeAllCommentsAndNags(node: AnyNode): void;
+    /**
+     * Removes all comments and NAGs from the game.
+     */
+    clearAllCommentsAndNags(): void;
+    /**
      * Promotes a variation
      * @param variationPath The path to the variation.
      */
