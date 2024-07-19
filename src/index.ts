@@ -58,11 +58,31 @@ const symbolClass = (move: MoveData) => {
     blunder: move.nags.includes(4),
     interesting: move.nags.includes(5),
     inaccuracy: move.nags.includes(6),
-  };
+    only: move.nags.includes(7),
+    equal: move.nags.includes(8),
+    unclear: move.nags.includes(9),
+    white_is_slightly_better: move.nags.includes(10),
+    black_is_slightly_better: move.nags.includes(11),
+    white_is_better: move.nags.includes(12),
+    black_is_better: move.nags.includes(13),
+    white_is_winning: move.nags.includes(14),
+    black_is_winning: move.nags.includes(15),
+    zugzwang: move.nags.includes(16),
+    development: move.nags.includes(17),
+    attack: move.nags.includes(18),
+    initiative: move.nags.includes(19),
+    with_compensation: move.nags.includes(20),
+    counterplay: move.nags.includes(21),
+    time_trouble: move.nags.includes(22),
+    with_the_idea: move.nags.includes(23),
+    novelty: move.nags.includes(24),
+    king_side: move.nags.includes(25),
+    queen_side: move.nags.includes(26),
+  }
   return Object.keys(classes)
     .filter((key) => classes[key])
-    .join(" ");
-};
+    .join(' ')
+}
 
 const hasSymbol = (move: MoveData) =>
   move.nags.length > 0 ? "with-symbol" : "";
