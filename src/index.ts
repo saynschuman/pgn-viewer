@@ -610,6 +610,39 @@ export class PgnViewer {
   }
 
   /**
+   * Recursively removes comments and NAGs from all nodes.
+   * @param node The node from which to remove comments and NAGs.
+   */
+  removeAllCommentsAndNags(node: AnyNode): void {
+    // @ts-ignore
+    if (node.data) {
+      // @ts-ignore
+      if (node.data.comments) {
+        // @ts-ignore
+        node.data.comments = []
+      }
+      // @ts-ignore
+      if (node.data.nags) {
+        // @ts-ignore
+        node.data.nags = []
+      }
+    }
+
+    if (node.children) {
+      node.children.forEach((child: AnyNode) => {
+        this.removeAllCommentsAndNags(child)
+      })
+    }
+  }
+
+  /**
+   * Removes all comments and NAGs from the game.
+   */
+  clearAllCommentsAndNags(): void {
+    this.removeAllCommentsAndNags(this.game.moves)
+  }
+
+  /**
    * Promotes a variation
    * @param variationPath The path to the variation.
    */
