@@ -223,6 +223,16 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+     * Checks recursively if there is any comment in all moves.
+     * @returns boolean indicating if any comment exists in the game.
+     */
+    hasAnyComment(): boolean;
+    /**
+     * Checks recursively if there is any NAG in all moves.
+     * @returns boolean indicating if any NAG exists in the game.
+     */
+    hasAnyNag(): boolean;
+    /**
      * Recursively removes comments and NAGs from all nodes.
      * @param node The node from which to remove comments and NAGs.
      */
