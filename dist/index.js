@@ -38,6 +38,15 @@ const symbolClass = (move) => {
         novelty: move.nags.includes(24),
         king_side: move.nags.includes(25),
         queen_side: move.nags.includes(26),
+        common_1: move.nags.includes(27),
+        common_2: move.nags.includes(28),
+        common_3: move.nags.includes(29),
+        common_4: move.nags.includes(30),
+        common_5: move.nags.includes(31),
+        common_6: move.nags.includes(32),
+        common_7: move.nags.includes(33),
+        common_8: move.nags.includes(34),
+        common_9: move.nags.includes(35),
     };
     return Object.keys(classes)
         .filter((key) => classes[key])
