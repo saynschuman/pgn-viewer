@@ -637,6 +637,50 @@ export class PgnViewer {
   }
 
   /**
+   * Checks recursively if there is any comment in all moves.
+   * @returns boolean indicating if any comment exists in the game.
+   */
+  hasAnyComment(): boolean {
+    const checkNodeForComment = (node: AnyNode): boolean => {
+      // @ts-ignore
+      if (node.data && node.data.comments && node.data.comments.length > 0) {
+        return true
+      }
+      if (node.children) {
+        for (const child of node.children) {
+          if (checkNodeForComment(child)) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+    return checkNodeForComment(this.game.moves)
+  }
+
+  /**
+   * Checks recursively if there is any NAG in all moves.
+   * @returns boolean indicating if any NAG exists in the game.
+   */
+  hasAnyNag(): boolean {
+    const checkNodeForNag = (node: AnyNode): boolean => {
+      // @ts-ignore
+      if (node.data && node.data.nags && node.data.nags.length > 0) {
+        return true
+      }
+      if (node.children) {
+        for (const child of node.children) {
+          if (checkNodeForNag(child)) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+    return checkNodeForNag(this.game.moves)
+  }
+
+  /**
    * Recursively removes comments and NAGs from all nodes.
    * @param node The node from which to remove comments and NAGs.
    */
