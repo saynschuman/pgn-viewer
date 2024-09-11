@@ -729,7 +729,7 @@ export class PgnViewer {
             // @ts-ignore
             if (lastNodeToAddComment && lastNodeToAddComment.data) {
                 // @ts-ignore
-                const newComments = [...lastNodeToAddComment.data.comments];
+                const newComments = [...lastNodeToAddComment.data.comments, `${mainlineResult}`];
                 // @ts-ignore
                 lastNodeToAddComment.data = {
                     // @ts-ignore
