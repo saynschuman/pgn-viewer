@@ -637,6 +637,28 @@ export class PgnViewer {
   }
 
   /**
+  * Removes all comments containing "Result: *".
+  */
+  public removeAllResultComments(): void {
+    // Функция для удаления комментариев с "Result" в одном узле
+    const removeResultCommentsInNode = (node: AnyNode): void => {
+      // @ts-ignore
+      if (node.data && node.data.comments) {
+        // @ts-ignore
+        node.data.comments = node.data.comments.filter(
+          // @ts-ignore
+          (comment) => !comment.includes("Result: *")
+        );
+      }
+      // Рекурсивно обрабатываем всех потомков
+      node.children.forEach((child) => removeResultCommentsInNode(child));
+    };
+
+    // Начинаем с корня дерева
+    removeResultCommentsInNode(this.game.moves);
+  }
+
+  /**
    * Checks recursively if there is any comment in all moves.
    * @returns boolean indicating if any comment exists in the game.
    */
@@ -793,6 +815,7 @@ export class PgnViewer {
         node.comments = []
       }
     })
+    this.removeAllResultComments()
   }
 
   /**
