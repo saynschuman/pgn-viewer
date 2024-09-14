@@ -223,6 +223,10 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+    * Removes all comments containing "Result: *".
+    */
+    removeAllResultComments(): void;
+    /**
      * Checks recursively if there is any comment in all moves.
      * @returns boolean indicating if any comment exists in the game.
      */
