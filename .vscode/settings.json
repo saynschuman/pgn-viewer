@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "gitignore",
         "package.json",
-        "vscode"
+        "vscode",
+        "PgnViewer"
     ]
 }
