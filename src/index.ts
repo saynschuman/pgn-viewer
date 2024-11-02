@@ -637,6 +637,30 @@ export class PgnViewer {
   }
 
   /**
+   * Returns a hashed string of the current PGN of the game using a simple hash function.
+   * @returns {string} The hashed PGN string.
+   */
+  getHashedPgn(): string {
+    const pgn = this.getGamePgn();
+    return this.simpleHash(pgn);
+  }
+
+  /**
+   * Computes a simple hash of a string.
+   * @param {string} message The input string.
+   * @returns {string} The hash as a hexadecimal string.
+   */
+  private simpleHash(message: string): string {
+    let hash = 0;
+    for (let i = 0; i < message.length; i++) {
+      const char = message.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash.toString(16);
+  }
+
+  /**
   * Removes all comments containing "Result: *".
   */
   public removeAllResultComments(): void {
