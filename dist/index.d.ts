@@ -223,6 +223,17 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+     * Returns a hashed string of the current PGN of the game using a simple hash function.
+     * @returns {string} The hashed PGN string.
+     */
+    getHashedPgn(): string;
+    /**
+     * Computes a simple hash of a string.
+     * @param {string} message The input string.
+     * @returns {string} The hash as a hexadecimal string.
+     */
+    private simpleHash;
+    /**
     * Removes all comments containing "Result: *".
     */
     removeAllResultComments(): void;

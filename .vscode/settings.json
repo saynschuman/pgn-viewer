@@ -3,6 +3,7 @@
         "gitignore",
         "package.json",
         "vscode",
-        "PgnViewer"
+        "PgnViewer",
+        "build"
     ]
 }
