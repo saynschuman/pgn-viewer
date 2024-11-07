@@ -620,6 +620,24 @@ export class PgnViewer {
         }
     }
     /**
+    * Returns the list of moves starting from the given path and traversing backward to the first move of that line.
+    * @param path The path string from which to start.
+    * @returns Array of MoveData representing the moves from the beginning of the given line to the provided path.
+    */
+    getMovesFromPath(path) {
+        const result = [];
+        // Start from the given path and move backward to gather moves
+        let currentNode = this.nodeAtPathOrNull(path);
+        // @ts-ignore
+        while (currentNode && currentNode.data) {
+            // @ts-ignore
+            result.unshift(currentNode.data); // Add the current move to the result array at the beginning
+            // @ts-ignore
+            currentNode = this.nodeAtPathOrNull(currentNode.data.path.init().path); // Move to the parent node
+        }
+        return result;
+    }
+    /**
      * Returns a hashed string of the current PGN of the game using a simple hash function.
      * @returns {string} The hashed PGN string.
      */

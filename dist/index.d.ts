@@ -223,6 +223,12 @@ export declare class PgnViewer {
     autoplay: boolean;
     constructor(opts: Opts);
     /**
+    * Returns the list of moves starting from the given path and traversing backward to the first move of that line.
+    * @param path The path string from which to start.
+    * @returns Array of MoveData representing the moves from the beginning of the given line to the provided path.
+    */
+    getMovesFromPath(path: string): MoveData[];
+    /**
      * Returns a hashed string of the current PGN of the game using a simple hash function.
      * @returns {string} The hashed PGN string.
      */
