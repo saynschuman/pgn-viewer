@@ -192,7 +192,9 @@ export const makeMoveNodes = (ctrl: PgnViewer): string[] => {
 
 export function renderPvMoves(
   currentFen: string,
-  pv: readonly string[]
+  pv: readonly string[],
+  startMove?: number,
+  startColor?: Color
 ): PvMove[] {
   const position = setupPosition(
     lichessRules("standard"),
@@ -200,16 +202,17 @@ export function renderPvMoves(
   );
   const pos = position.unwrap();
   const vnodes: PvMove[] = [];
+
+  let moveNumber = startMove ?? pos.fullmoves;
+  let turn: Color = startColor ?? pos.turn;
+
   for (let i = 0; i < pv.length; i++) {
-    let text;
-    if (pos.turn === "white") {
-      text = `${pos.fullmoves}.`;
+    if (turn === "white") {
+      vnodes.push({ text: `${moveNumber}.` });
     } else if (i === 0) {
-      text = `${pos.fullmoves}...`;
+      vnodes.push({ text: `${moveNumber}...` });
     }
-    if (text) {
-      vnodes.push({ text });
-    }
+
     const uci = pv[i];
     const san = makeSanAndPlay(pos, parseUci(uci)!);
     const fen = makeBoardFen(pos.board); // Chessground uses only board fen
@@ -217,7 +220,13 @@ export function renderPvMoves(
       break;
     }
     vnodes.push({ fen: `${fen}`, san, uci });
+
+    if (turn === "black") {
+      moveNumber++;
+    }
+    turn = turn === "white" ? "black" : "white";
   }
+
   return vnodes;
 }
 
