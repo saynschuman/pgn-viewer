@@ -11,7 +11,7 @@
   "author": "Vitalii Kuzin",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "chessground": "^9.0.4",
+    "chessground": "^9.2.1",
     "chessops": "^0.14.0"
   },
   "keywords": [
