@@ -4,7 +4,10 @@
   "description": "A TypeScript module for parsing PGN moves and displaying them in a web page.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/saynschuman/pgn-viewer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saynschuman/pgn-viewer.git"
+  },
   "scripts": {
     "build": "tsc"
   },
