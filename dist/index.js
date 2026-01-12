@@ -134,20 +134,18 @@ export const makeMoveNodes = (ctrl) => {
     }
     return elms;
 };
-export function renderPvMoves(currentFen, pv) {
+export function renderPvMoves(currentFen, pv, startMove, startColor) {
     const position = setupPosition(lichessRules("standard"), parseFen(currentFen).unwrap());
     const pos = position.unwrap();
     const vnodes = [];
+    let moveNumber = startMove !== null && startMove !== void 0 ? startMove : pos.fullmoves;
+    let turn = startColor !== null && startColor !== void 0 ? startColor : pos.turn;
     for (let i = 0; i < pv.length; i++) {
-        let text;
-        if (pos.turn === "white") {
-            text = `${pos.fullmoves}.`;
+        if (turn === "white") {
+            vnodes.push({ text: `${moveNumber}.` });
         }
         else if (i === 0) {
-            text = `${pos.fullmoves}...`;
-        }
-        if (text) {
-            vnodes.push({ text });
+            vnodes.push({ text: `${moveNumber}...` });
         }
         const uci = pv[i];
         const san = makeSanAndPlay(pos, parseUci(uci));
@@ -156,6 +154,10 @@ export function renderPvMoves(currentFen, pv) {
             break;
         }
         vnodes.push({ fen: `${fen}`, san, uci });
+        if (turn === "black") {
+            moveNumber++;
+        }
+        turn = turn === "white" ? "black" : "white";
     }
     return vnodes;
 }

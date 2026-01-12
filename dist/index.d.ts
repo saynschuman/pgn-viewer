@@ -40,7 +40,7 @@ export declare const makeMainVariation: (moveDom: MoveToDom, node: MoveNode) => 
 })[];
 export declare const makeVariationMoves: (moveDom: MoveToDom, node: MoveNode) => string[];
 export declare const makeMoveNodes: (ctrl: PgnViewer) => string[];
-export declare function renderPvMoves(currentFen: string, pv: readonly string[]): PvMove[];
+export declare function renderPvMoves(currentFen: string, pv: readonly string[], startMove?: number, startColor?: Color): PvMove[];
 export declare class Path {
     readonly path: string;
     constructor(path: string);
